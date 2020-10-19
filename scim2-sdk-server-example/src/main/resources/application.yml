@@ -1,0 +1,19 @@
+server:
+    port: 8880
+    hostName: localhost
+
+spring:
+    application:
+        name: scim2-sdk-server-example
+        version: 1.0.0
+    jackson:
+        default-property-inclusion: non_null
+        serialization:
+            INDENT_OUTPUT: true
+    mvc:
+        async:
+            request-timeout: 3600000
+            requestTimeout: 3600000
+        profiles:
+            active:
+                - prod

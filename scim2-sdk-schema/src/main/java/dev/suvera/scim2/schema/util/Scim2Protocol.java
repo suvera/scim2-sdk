@@ -390,7 +390,7 @@ public class Scim2Protocol {
             ScimResponse response,
             ResourceType resourceType
     ) throws ScimException {
-        System.out.println("XXXXX:" + response);
+        
         if (!sp.getPatch().getSupported()) {
             return;
         }

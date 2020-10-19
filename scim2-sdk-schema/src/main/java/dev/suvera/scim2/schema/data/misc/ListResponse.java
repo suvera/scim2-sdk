@@ -1,11 +1,13 @@
 package dev.suvera.scim2.schema.data.misc;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.suvera.scim2.schema.data.BaseRecord;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -29,4 +31,12 @@ public class ListResponse<T extends BaseRecord> {
 
     @JsonProperty("Resources")
     private List<T> resources;
+
+    @JsonIgnore
+    public void addResource(T resource) {
+        if (resources == null) {
+            resources = new ArrayList<>();
+        }
+        resources.add(resource);
+    }
 }

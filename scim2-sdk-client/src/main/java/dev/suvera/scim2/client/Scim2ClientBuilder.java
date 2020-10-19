@@ -23,6 +23,7 @@ public class Scim2ClientBuilder {
     private final String endPoint;
     private final OkHttpClient.Builder builder;
     private static final boolean DEBUG = false;
+    private boolean debugEnabled = false;
 
     public Scim2ClientBuilder(String endPoint) {
         this.endPoint = endPoint;
@@ -33,11 +34,21 @@ public class Scim2ClientBuilder {
         if (DEBUG) {
             builder.networkInterceptors().add(new HttpLoggingInterceptor("NETWORK"));
             builder.interceptors().add(new HttpLoggingInterceptor("APP"));
+            debugEnabled = true;
         }
     }
 
     public Scim2Client build() throws ScimException {
         return new Scim2ClientImpl(endPoint, builder.build());
+    }
+
+    public Scim2ClientBuilder enableDebugging() {
+        if (!debugEnabled) {
+            builder.networkInterceptors().add(new HttpLoggingInterceptor("NETWORK"));
+            builder.interceptors().add(new HttpLoggingInterceptor("APP"));
+            debugEnabled = true;
+        }
+        return this;
     }
 
     public Scim2ClientBuilder usernamePassword(String username, String password) {

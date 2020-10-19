@@ -28,7 +28,7 @@ public class ScimException extends Exception {
     }
 
     public ScimException(Exception e) {
-        super(e);
+        super(e.getMessage(), e);
     }
 
     public ErrorRecord getError() {

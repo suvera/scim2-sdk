@@ -1,8 +1,10 @@
 package dev.suvera.scim2.schema.data.sp;
 
 import dev.suvera.scim2.schema.data.BaseRecord;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -32,12 +34,16 @@ public class SpConfig extends BaseRecord {
     private List<AuthenticationScheme> authenticationSchemes;
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Supported {
         @NotNull(message = "supported cannot be null")
         private Boolean supported;
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Bulk {
         @NotNull(message = "supported cannot be null")
         private Boolean supported;
@@ -48,6 +54,8 @@ public class SpConfig extends BaseRecord {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Filter {
         @NotNull(message = "supported cannot be null")
         private Boolean supported;
@@ -56,6 +64,8 @@ public class SpConfig extends BaseRecord {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class AuthenticationScheme {
         @NotBlank(message = "type cannot be null")
         private String type;
