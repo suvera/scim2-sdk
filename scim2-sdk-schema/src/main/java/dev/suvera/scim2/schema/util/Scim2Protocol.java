@@ -2,6 +2,7 @@ package dev.suvera.scim2.schema.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
@@ -21,11 +22,14 @@ import dev.suvera.scim2.schema.data.sp.SpConfig;
 import dev.suvera.scim2.schema.enums.ScimOperation;
 import dev.suvera.scim2.schema.ex.ScimException;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,8 +42,11 @@ import java.util.Set;
 @SuppressWarnings({"unused"})
 @Data
 public class Scim2Protocol {
+    private final static Logger log = LogManager.getLogger(Scim2Protocol.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final Validator beanValidator;
+    private static final boolean DEBUG = false;
+
     private SpConfig sp;
     private final Map<String, Schema> schemas = new HashMap<>();
     private final Map<String, ResourceType> resourceTypes = new HashMap<>();
@@ -49,8 +56,17 @@ public class Scim2Protocol {
             ScimResponse resourceTypesResponse,
             ScimResponse schemasResponse
     ) throws ScimException {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        beanValidator = factory.getValidator();
+        beanValidator = Validation.byDefaultProvider()
+                .configure()
+                .messageInterpolator(new ParameterMessageInterpolator())
+                .buildValidatorFactory()
+                .getValidator();
+
+        if (DEBUG) {
+            log.info("spResponse {}", spResponse);
+            log.info("resourceTypesResponse {}", resourceTypesResponse);
+            log.info("schemasResponse {}", schemasResponse);
+        }
 
         buildSpConfig(spResponse);
         buildResourceTypes(resourceTypesResponse);
@@ -168,7 +184,7 @@ public class Scim2Protocol {
             verifySchemasInResponse(
                     resource,
                     resourceType.getSchemas(),
-                    ImmutableSet.of(ScimConstant.URN_SCHEMA),
+                    ImmutableSet.of(ScimConstant.URN_RESOURCE_TYPE),
                     true
             );
 
@@ -182,7 +198,7 @@ public class Scim2Protocol {
                         + error);
             }
 
-            resourceTypes.put(resourceType.getId(), resourceType);
+            resourceTypes.put(resourceType.getSchema(), resourceType);
         }
     }
 
@@ -228,8 +244,11 @@ public class Scim2Protocol {
             );
 
             try {
-                resourceType.setJsonSchema(JsonSchemaFactory.byDefault()
-                        .getJsonSchema(JsonLoader.fromString(builder.build())));
+                JsonNode sNode = JsonLoader.fromString(builder.build());
+                if (DEBUG) {
+                    log.info(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(sNode));
+                }
+                resourceType.setJsonSchema(JsonSchemaFactory.byDefault().getJsonSchema(sNode));
             } catch (Exception e) {
                 throw new ScimException("JSON Schema generation failed", e);
             }
@@ -371,7 +390,7 @@ public class Scim2Protocol {
             ScimResponse response,
             ResourceType resourceType
     ) throws ScimException {
-
+        System.out.println("XXXXX:" + response);
         if (!sp.getPatch().getSupported()) {
             return;
         }
@@ -446,7 +465,11 @@ public class Scim2Protocol {
             throw new ScimException("Empty HTTP Response for " + resource);
         }
 
-        String contentType = response.header(ScimConstant.CONTENT_TYPE);
+        String contentType = response.header(ScimConstant.CONTENT_TYPE.toLowerCase());
+        if (contentType != null) {
+            String[] parts = StringUtils.split(contentType, ';');
+            contentType = parts[0].trim();
+        }
         if (contentType == null || !ScimConstant.SCIM_CONTENT_TYPES.contains(contentType)) {
             throw new ScimException("Invalid Response for " + resource + ", header "
                     + ScimConstant.CONTENT_TYPE + " is not received. expected value is one of ["

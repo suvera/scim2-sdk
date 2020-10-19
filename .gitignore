@@ -14,6 +14,8 @@ scim2-sdk-client/target/
 scim2-sdk-shema/target/
 scim2-sdk-server/target/
 scim2-sdk-server-example/target/
+MyTests.java
+scim2-sdk-client/src/test/java/dev/suvera/scim2/client/tests/MyTests.java
 
 # Package Files #
 *.jar

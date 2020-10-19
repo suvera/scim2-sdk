@@ -6,10 +6,7 @@ import dev.suvera.scim2.schema.data.Attribute;
 import dev.suvera.scim2.schema.data.schema.Schema;
 import dev.suvera.scim2.schema.data.schema.SchemaExtension;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * author: suvera
@@ -56,10 +53,22 @@ public class JsonSchemaBuilder {
                 .k("additionalItems", false)
         ;
 
+        Set<String> allUrnIds = new HashSet<>();
+        allUrnIds.add(scimSchema.getId());
+        if (extensions != null) {
+            for (SchemaExtension extension : extensions) {
+                allUrnIds.add(extension.getSchema().getId());
+            }
+        }
+
         Xmap props = Xmap.q();
         props.k("schemas", Xmap.q()
                 .k("type", "array")
-                .k("items", Xmap.q().k("type", "string").get())
+                .k("items", Xmap.q()
+                        .k("type", "string")
+                        .k("enum", allUrnIds)
+                        .get()
+                )
                 .get()
         );
         props.k("totalResults", Xmap.q()
@@ -95,10 +104,22 @@ public class JsonSchemaBuilder {
     }
 
     private void buildProperties(Xmap propNode) {
+        Set<String> allUrnIds = new HashSet<>();
+        allUrnIds.add(scimSchema.getId());
+        if (extensions != null) {
+            for (SchemaExtension extension : extensions) {
+                allUrnIds.add(extension.getSchema().getId());
+            }
+        }
+
         Xmap props = Xmap.q();
         props.k("schemas", Xmap.q()
                 .k("type", "array")
-                .k("items", Xmap.q().k("type", "string").get())
+                .k("items", Xmap.q()
+                        .k("type", "string")
+                        .k("enum", allUrnIds)
+                        .get()
+                )
                 .get()
         );
         props.k("id", Xmap.q()
@@ -174,7 +195,7 @@ public class JsonSchemaBuilder {
                 break;
         }
 
-        if (attr.getCanonicalValues() != null) {
+        if (attr.getCanonicalValues() != null && !attr.getCanonicalValues().isEmpty()) {
             map.k("enum", attr.getCanonicalValues());
         }
 

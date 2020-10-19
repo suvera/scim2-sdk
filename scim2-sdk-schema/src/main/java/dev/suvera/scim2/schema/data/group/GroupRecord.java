@@ -1,8 +1,6 @@
 package dev.suvera.scim2.schema.data.group;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import dev.suvera.scim2.schema.data.BaseRecord;
 import dev.suvera.scim2.schema.data.ExtensionRecord;
 import lombok.Data;
@@ -38,10 +36,12 @@ public class GroupRecord extends BaseRecord {
 
 
     @Data
-    static class GroupMember {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class GroupMember {
         private String type;
         private String display;
         private String value;
-        private String $ref;
+        @JsonProperty("$ref")
+        private String ref;
     }
 }

@@ -18,6 +18,8 @@ import dev.suvera.scim2.schema.util.UrlUtil;
 import lombok.Data;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -31,7 +33,10 @@ import static dev.suvera.scim2.schema.ScimConstant.*;
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
 @Data
 public class Scim2ClientImpl implements Scim2Client {
+    private final static Logger log = LogManager.getLogger(Scim2ClientImpl.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final boolean DEBUG = false;
+
     private final String endPoint;
     private final OkHttpClient client;
     private Scim2Protocol protocol;
@@ -60,6 +65,8 @@ public class Scim2ClientImpl implements Scim2Client {
         if (path == null) {
             throw new ScimException("Client Exception, empty Path");
         }
+
+        log.info("Http {} request {}", method, path);
         path = StringUtils.stripStart(path, " /");
         path = "/" + path;
 
@@ -74,21 +81,41 @@ public class Scim2ClientImpl implements Scim2Client {
                 .url(endPoint + path)
                 .header("X-Requested-With", CLIENT_NAME);
 
-        if (!HttpMethod.GET.equals(method)) {
-            if (payload != null) {
-                String body;
-                if (payload instanceof String) {
-                    body = payload.toString();
-                } else {
-                    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-                    try {
-                        body = objectMapper.writeValueAsString(payload);
-                    } catch (JsonProcessingException e) {
-                        throw new ScimException("Failed whole encoding object to JSON", e);
-                    }
+        String body = null;
+        if (payload != null) {
+            if (payload instanceof String) {
+                body = payload.toString();
+            } else {
+                objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                try {
+                    body = objectMapper.writeValueAsString(payload);
+                } catch (JsonProcessingException e) {
+                    throw new ScimException("Failed whole encoding object to JSON", e);
                 }
-                builder.post(RequestBody.create(body, MediaType.parse("application/scim+json")));
             }
+        }
+
+        if (HttpMethod.DELETE.equals(method)) {
+            if (body != null && !body.isEmpty()) {
+                builder.delete(RequestBody.create(body, MediaType.parse("application/scim+json")));
+            } else {
+                builder.header(CONTENT_TYPE, "application/scim+json").delete();
+            }
+        } else if (HttpMethod.PUT.equals(method)) {
+            if (body == null) {
+                body = "";
+            }
+            builder.put(RequestBody.create(body, MediaType.parse("application/scim+json")));
+        } else if (HttpMethod.PATCH.equals(method)) {
+            if (body == null) {
+                body = "";
+            }
+            builder.patch(RequestBody.create(body, MediaType.parse("application/scim+json")));
+        } else if (!HttpMethod.GET.equals(method)) {
+            if (body == null) {
+                body = "";
+            }
+            builder.post(RequestBody.create(body, MediaType.parse("application/scim+json")));
         }
 
         Request request = builder.build();
@@ -227,7 +254,11 @@ public class Scim2ClientImpl implements Scim2Client {
         PatchResponse<T> patchResponse = new PatchResponse<>(request.getRecordType());
 
         patchResponse.setStatus(response.getCode());
-        patchResponse.setResource(mapToObject(response.getBody(), request.getRecordType()));
+        try {
+            patchResponse.setResource(mapToObject(response.getBody(), request.getRecordType()));
+        } catch (ScimException e) {
+            log.error("Patch request has no Resource received. {}", e.getMessage());
+        }
 
         return patchResponse;
     }
@@ -316,26 +347,26 @@ public class Scim2ClientImpl implements Scim2Client {
 
     @Override
     public ResourceType getResourceType(String schemaId) {
-        return null;
+        return protocol.getResourceType(schemaId);
     }
 
     @Override
     public Schema getSchema(String schemaId) {
-        return null;
+        return protocol.getSchema(schemaId);
     }
 
     @Override
     public SpConfig getSpConfig() {
-        return null;
+        return protocol.getSp();
     }
 
     @Override
     public Collection<ResourceType> getResourceTypes() {
-        return null;
+        return protocol.getResourceTypes().values();
     }
 
     @Override
     public Collection<Schema> getSchemas() {
-        return null;
+        return protocol.getSchemas().values();
     }
 }

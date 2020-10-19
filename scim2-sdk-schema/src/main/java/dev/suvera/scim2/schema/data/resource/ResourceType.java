@@ -1,6 +1,7 @@
 package dev.suvera.scim2.schema.data.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.google.common.base.Objects;
 import dev.suvera.scim2.schema.data.BaseRecord;
@@ -19,12 +20,13 @@ import java.util.Set;
 @Data
 public class ResourceType extends BaseRecord {
     @NotBlank(message = "name cannot be empty")
-    protected String name;
-    protected String description;
+    private String name;
+    private String description;
     @NotBlank(message = "endPoint cannot be empty")
-    protected String endPoint;
+    @JsonProperty("endpoint")
+    private String endPoint;
     @NotBlank(message = "schema cannot be empty")
-    protected String schema;
+    private String schema;
     private Set<SchemaExt> schemaExtensions = new HashSet<>();
 
     @JsonIgnore

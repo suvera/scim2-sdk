@@ -1,9 +1,6 @@
 package dev.suvera.scim2.schema.data.user;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import dev.suvera.scim2.schema.data.BaseRecord;
 import dev.suvera.scim2.schema.data.ExtensionRecord;
 import lombok.Data;
@@ -58,7 +55,8 @@ public class UserRecord extends BaseRecord {
     }
 
     @Data
-    static class UserName {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserName {
         private String formatted;
         private String familyName;
         private String givenName;
@@ -68,7 +66,8 @@ public class UserRecord extends BaseRecord {
     }
 
     @Data
-    static class UserEmail {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserEmail {
         private String value;
         private String display;
         private String type;
@@ -76,7 +75,8 @@ public class UserRecord extends BaseRecord {
     }
 
     @Data
-    static class UserPhoneNumber {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserPhoneNumber {
         private String value;
         private String display;
         private String type;
@@ -84,7 +84,8 @@ public class UserRecord extends BaseRecord {
     }
 
     @Data
-    static class UserIm {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserIm {
         private String value;
         private String display;
         private String type;
@@ -92,14 +93,16 @@ public class UserRecord extends BaseRecord {
     }
 
     @Data
-    static class UserPhoto {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserPhoto {
         private String value;
         private String type;
         private boolean primary;
     }
 
     @Data
-    static class UserAddress {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserAddress {
         private String formatted;
         private String streetAddress;
         private String locality;
@@ -111,23 +114,18 @@ public class UserRecord extends BaseRecord {
     }
 
     @Data
-    static class UserGroup {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserGroup {
         private String value;
-        private String $ref;
+        @JsonProperty("$ref")
+        private String ref;
         private String display;
         private String type;
     }
 
     @Data
-    static class UserEntitlement {
-        private String value;
-        private String display;
-        private String type;
-        private boolean primary;
-    }
-
-    @Data
-    static class UserRole {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserEntitlement {
         private String value;
         private String display;
         private String type;
@@ -135,7 +133,17 @@ public class UserRecord extends BaseRecord {
     }
 
     @Data
-    static class UserX509Certificate {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserRole {
+        private String value;
+        private String display;
+        private String type;
+        private boolean primary;
+    }
+
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class UserX509Certificate {
         private String value;
         private String display;
         private String type;

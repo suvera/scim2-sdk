@@ -9,6 +9,7 @@ import dev.suvera.scim2.schema.enums.UniquenessType;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class Attribute {
     @NotBlank(message = "name cannot be empty")
     private String name;
     private String description;
-    @NotBlank(message = "type cannot be empty")
+    @NotNull(message = "type cannot be empty")
     private AttributeType type = AttributeType.STRING;
     private boolean caseExact = false;
     private boolean multiValued = false;
@@ -33,6 +34,7 @@ public class Attribute {
     private ReturnedType returned = ReturnedType.DEFAULT;
     private UniquenessType uniqueness = UniquenessType.NONE;
     private Set<Object> canonicalValues = new HashSet<>();
+    private Set<String> referenceTypes = new HashSet<>();
 
     private Set<Attribute> subAttributes = new HashSet<>();
 

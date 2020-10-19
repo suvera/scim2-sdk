@@ -1,9 +1,9 @@
 package dev.suvera.scim2.schema.data.misc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.suvera.scim2.schema.data.BaseRecord;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -27,5 +27,6 @@ public class ListResponse<T extends BaseRecord> {
     private Integer itemsPerPage;
     private Integer startIndex;
 
-    private List<T> Resources;
+    @JsonProperty("Resources")
+    private List<T> resources;
 }

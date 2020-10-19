@@ -22,12 +22,18 @@ import java.util.concurrent.TimeUnit;
 public class Scim2ClientBuilder {
     private final String endPoint;
     private final OkHttpClient.Builder builder;
+    private static final boolean DEBUG = false;
 
     public Scim2ClientBuilder(String endPoint) {
         this.endPoint = endPoint;
         builder = new OkHttpClient.Builder()
                 .connectTimeout(1200000, TimeUnit.SECONDS)
                 .readTimeout(1200000, TimeUnit.SECONDS);
+
+        if (DEBUG) {
+            builder.networkInterceptors().add(new HttpLoggingInterceptor("NETWORK"));
+            builder.interceptors().add(new HttpLoggingInterceptor("APP"));
+        }
     }
 
     public Scim2Client build() throws ScimException {
@@ -63,7 +69,7 @@ public class Scim2ClientBuilder {
 
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
-                    return null;
+                    return new java.security.cert.X509Certificate[]{};
                 }
             };
             SSLContext sslContext = SSLContext.getInstance("TLS");
