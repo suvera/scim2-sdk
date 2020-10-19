@@ -23,7 +23,9 @@ java -jar target/scim2-sdk-server-example-1.0.0-SNAPSHOT.jar
 Open your browser and check the SCIM 2.0 schemas.
 
 http://localhost:8880/scim2/ServiceProviderConfig
+
 http://localhost:8880/scim2/ResourceTypes
+
 http://localhost:8880/scim2/Schemas
 
 
