@@ -51,7 +51,7 @@ This library contains SCIM 2.0 protocol definitions, json schemas, resources, an
 
 ## scim2-sdk-client
 
-This library contains SCIM 2.0 protocol definitions, json schemas, resources, and helper utilities. 
+This library contains SCIM 2.0 compatible Http client.
 
 ```
 <dependency>
@@ -62,7 +62,7 @@ This library contains SCIM 2.0 protocol definitions, json schemas, resources, an
 ```
 
 
-You can build a Scim2Client object like below.
+You can build a **client** object like below.
 
 ```
 Scim2Client client = new Scim2ClientBuilder("http://localhost:8880/scim2")
