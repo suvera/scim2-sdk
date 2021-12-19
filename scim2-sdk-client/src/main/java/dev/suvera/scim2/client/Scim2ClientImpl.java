@@ -73,6 +73,10 @@ public class Scim2ClientImpl implements Scim2Client {
         headers.put(ScimConstant.CONTENT_TYPE.toLowerCase(), Collections.singletonList("application/scim+json"));
         try {
             spResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_SP, null));
+            if (spResponse.getCode() != 200) {
+                log.error("Response code for " + PATH_SP + " is not 200, but " + spResponse.getCode());
+                throw new ScimException("Response code for " + PATH_SP + " is not 200, but " + spResponse.getCode());
+            }
         } catch (ScimException e) {
             if (spConfigJson != null && !spConfigJson.isEmpty()) {
                 log.info("Could not get response from {}, Using Default Json for ServiceProviderConfig", PATH_SP);
@@ -85,6 +89,10 @@ public class Scim2ClientImpl implements Scim2Client {
         ScimResponse rtResponse;
         try {
             rtResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_RESOURCETYPES, null));
+            if (rtResponse.getCode() != 200) {
+                log.error("Response code for " + PATH_RESOURCETYPES + " is not 200, but " + rtResponse.getCode());
+                throw new ScimException("Response code for " + PATH_RESOURCETYPES + " is not 200, but " + rtResponse.getCode());
+            }
         } catch (ScimException e) {
             if (resourceTypesJson != null && !resourceTypesJson.isEmpty()) {
                 log.info("Could not get response from {}, Using Default Json for ResourceTypes", PATH_RESOURCETYPES);
@@ -97,6 +105,10 @@ public class Scim2ClientImpl implements Scim2Client {
         ScimResponse schemasResponse;
         try {
             schemasResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_SCHEMAS, null));
+            if (schemasResponse.getCode() != 200) {
+                log.error("Response code for " + PATH_SCHEMAS + " is not 200, but " + schemasResponse.getCode());
+                throw new ScimException("Response code for " + PATH_SCHEMAS + " is not 200, but " + schemasResponse.getCode());
+            }
         } catch (ScimException e) {
             if (schemasJson != null && !schemasJson.isEmpty()) {
                 log.info("Could not get response from {}, Using Default Json for Schemas", PATH_SCHEMAS);
@@ -106,6 +118,7 @@ public class Scim2ClientImpl implements Scim2Client {
             }
         }
 
+        log.info("Got SCIM Implementation Details");
         this.protocol = new Scim2Protocol(spResponse, rtResponse, schemasResponse);
     }
 
