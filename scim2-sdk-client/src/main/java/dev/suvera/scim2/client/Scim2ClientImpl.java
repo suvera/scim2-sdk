@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.suvera.scim2.schema.ScimConstant;
 import dev.suvera.scim2.schema.data.BaseRecord;
 import dev.suvera.scim2.schema.data.ScimResponse;
 import dev.suvera.scim2.schema.data.misc.*;
@@ -22,8 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 import static dev.suvera.scim2.schema.ScimConstant.*;
 
@@ -69,11 +69,14 @@ public class Scim2ClientImpl implements Scim2Client {
         this.client = client;
 
         ScimResponse spResponse;
+        Map<String, List<String>> headers = new HashMap<>();
+        headers.put(ScimConstant.CONTENT_TYPE.toLowerCase(), Collections.singletonList("application/scim+json"));
         try {
-            spResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_SP, null));
+            spResponse = ScimResponse.of(doRequest(HttpMethod.GET, , null));
         } catch (ScimException e) {
             if (spConfigJson != null && !spConfigJson.isEmpty()) {
-                spResponse = new ScimResponse(200, spConfigJson, Collections.emptyMap());
+                log.info("Could not get response from {}, Using Default Json for ServiceProviderConfig", PATH_SP);
+                spResponse = new ScimResponse(200, spConfigJson, headers);
             } else {
                 throw e;
             }
@@ -84,7 +87,8 @@ public class Scim2ClientImpl implements Scim2Client {
             rtResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_RESOURCETYPES, null));
         } catch (ScimException e) {
             if (resourceTypesJson != null && !resourceTypesJson.isEmpty()) {
-                rtResponse = new ScimResponse(200, resourceTypesJson, Collections.emptyMap());
+                log.info("Could not get response from {}, Using Default Json for ResourceTypes", PATH_RESOURCETYPES);
+                rtResponse = new ScimResponse(200, resourceTypesJson, headers);
             } else {
                 throw e;
             }
@@ -95,7 +99,8 @@ public class Scim2ClientImpl implements Scim2Client {
             schemasResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_SCHEMAS, null));
         } catch (ScimException e) {
             if (schemasJson != null && !schemasJson.isEmpty()) {
-                schemasResponse = new ScimResponse(200, schemasJson, Collections.emptyMap());
+                log.info("Could not get response from {}, Using Default Json for Schemas", PATH_SCHEMAS);
+                schemasResponse = new ScimResponse(200, schemasJson, headers);
             } else {
                 throw e;
             }
