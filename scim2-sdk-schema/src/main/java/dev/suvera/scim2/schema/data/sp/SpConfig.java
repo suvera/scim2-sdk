@@ -74,5 +74,6 @@ public class SpConfig extends BaseRecord {
         private String description;
         private String specUri;
         private String documentationUri;
+        private Boolean primary;
     }
 }

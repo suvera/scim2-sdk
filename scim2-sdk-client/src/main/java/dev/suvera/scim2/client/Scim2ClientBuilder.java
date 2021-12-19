@@ -24,6 +24,9 @@ public class Scim2ClientBuilder {
     private final OkHttpClient.Builder builder;
     private static final boolean DEBUG = false;
     private boolean debugEnabled = false;
+    private String spConfigJson;
+    private String resourceTypesJson;
+    private String schemasJson;
 
     public Scim2ClientBuilder(String endPoint) {
         this.endPoint = endPoint;
@@ -39,7 +42,7 @@ public class Scim2ClientBuilder {
     }
 
     public Scim2Client build() throws ScimException {
-        return new Scim2ClientImpl(endPoint, builder.build());
+        return new Scim2ClientImpl(endPoint, builder.build(), spConfigJson, resourceTypesJson, schemasJson);
     }
 
     public Scim2ClientBuilder enableDebugging() {
@@ -58,6 +61,21 @@ public class Scim2ClientBuilder {
 
     public Scim2ClientBuilder bearerToken(String token) {
         builder.authenticator(new BearerAuthenticator(token));
+        return this;
+    }
+
+    public Scim2ClientBuilder serviceProviderConfig(String spConfigJson) {
+        this.spConfigJson = spConfigJson;
+        return this;
+    }
+
+    public Scim2ClientBuilder resourceTypes(String resourceTypesJson) {
+        this.resourceTypesJson = resourceTypesJson;
+        return this;
+    }
+
+    public Scim2ClientBuilder schemas(String schemasJson) {
+        this.schemasJson = schemasJson;
         return this;
     }
 

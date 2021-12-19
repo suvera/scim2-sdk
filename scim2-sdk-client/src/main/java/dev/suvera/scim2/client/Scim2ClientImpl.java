@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 
 import static dev.suvera.scim2.schema.ScimConstant.*;
 
@@ -37,24 +38,70 @@ public class Scim2ClientImpl implements Scim2Client {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final boolean DEBUG = false;
 
-    private final String endPoint;
-    private final OkHttpClient client;
+    private String endPoint;
+    private OkHttpClient client;
     private Scim2Protocol protocol;
+    private String spConfigJson;
+    private String resourceTypesJson;
+    private String schemasJson;
 
     protected Scim2ClientImpl(String endPoint, OkHttpClient client) throws ScimException {
+        init(endPoint, client);
+    }
+
+    protected Scim2ClientImpl(
+        String endPoint,
+        OkHttpClient client,
+        String spConfigJson,
+        String resourceTypesJson,
+        String schemasJson
+    ) throws ScimException {
+        this.spConfigJson = spConfigJson;
+        this.resourceTypesJson = resourceTypesJson;
+        this.schemasJson = schemasJson;
+        init(endPoint, client);
+    }
+
+    private void init(String endPoint, OkHttpClient client) throws ScimException {
         endPoint = StringUtils.stripEnd(endPoint, " /");
 
         this.endPoint = endPoint;
         this.client = client;
-        init();
-    }
 
-    private void init() throws ScimException {
-        this.protocol = new Scim2Protocol(
-                ScimResponse.of(doRequest(HttpMethod.GET, PATH_SP, null)),
-                ScimResponse.of(doRequest(HttpMethod.GET, PATH_RESOURCETYPES, null)),
-                ScimResponse.of(doRequest(HttpMethod.GET, PATH_SCHEMAS, null))
-        );
+        ScimResponse spResponse;
+        try {
+            spResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_SP, null));
+        } catch (ScimException e) {
+            if (spConfigJson != null && !spConfigJson.isEmpty()) {
+                spResponse = new ScimResponse(200, spConfigJson, Collections.emptyMap());
+            } else {
+                throw e;
+            }
+        }
+
+        ScimResponse rtResponse;
+        try {
+            rtResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_RESOURCETYPES, null));
+        } catch (ScimException e) {
+            if (resourceTypesJson != null && !resourceTypesJson.isEmpty()) {
+                rtResponse = new ScimResponse(200, resourceTypesJson, Collections.emptyMap());
+            } else {
+                throw e;
+            }
+        }
+
+        ScimResponse schemasResponse;
+        try {
+            schemasResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_SCHEMAS, null));
+        } catch (ScimException e) {
+            if (schemasJson != null && !schemasJson.isEmpty()) {
+                schemasResponse = new ScimResponse(200, schemasJson, Collections.emptyMap());
+            } else {
+                throw e;
+            }
+        }
+
+        this.protocol = new Scim2Protocol(spResponse, rtResponse, schemasResponse);
     }
 
     private Response doRequest(
