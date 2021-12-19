@@ -72,7 +72,7 @@ public class Scim2ClientImpl implements Scim2Client {
         Map<String, List<String>> headers = new HashMap<>();
         headers.put(ScimConstant.CONTENT_TYPE.toLowerCase(), Collections.singletonList("application/scim+json"));
         try {
-            spResponse = ScimResponse.of(doRequest(HttpMethod.GET, , null));
+            spResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_SP, null));
         } catch (ScimException e) {
             if (spConfigJson != null && !spConfigJson.isEmpty()) {
                 log.info("Could not get response from {}, Using Default Json for ServiceProviderConfig", PATH_SP);
