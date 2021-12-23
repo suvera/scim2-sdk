@@ -140,3 +140,8 @@ This is a Spring Boot library, can be added to your boot application like below.
 ### Example:
 
 There is an example server implementation [scim2-sdk-server-example](scim2-sdk-server-example) for more information.
+
+
+## Is your server is compliant to SCIM 2.0?
+
+Here is the tool to test the compliance level  https://github.com/suvera/scim2-compliance-test-utility
