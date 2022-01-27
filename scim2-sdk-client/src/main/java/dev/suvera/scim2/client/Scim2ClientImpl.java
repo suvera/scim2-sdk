@@ -2,6 +2,7 @@ package dev.suvera.scim2.client;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.suvera.scim2.schema.ScimConstant;
@@ -76,6 +77,12 @@ public class Scim2ClientImpl implements Scim2Client {
             if (spResponse.getCode() != 200) {
                 log.error("Response code for " + PATH_SP + " is not 200, but " + spResponse.getCode());
                 throw new ScimException("Response code for " + PATH_SP + " is not 200, but " + spResponse.getCode());
+            } else if (spResponse.getBody() == null || spResponse.getBody().isEmpty()) {
+                log.error("Response Body for " + PATH_SP + " is empty");
+                throw new ScimException("Response Body is empty for " + PATH_SP);
+            } else if (!isValidJSON(spResponse.getBody())) {
+                log.error("Response Body for " + PATH_SP + " is NOT a valid JSON");
+                throw new ScimException("Response Body for " + PATH_SP + " is NOT a valid JSON");
             }
         } catch (ScimException e) {
             if (spConfigJson != null && !spConfigJson.isEmpty()) {
@@ -92,6 +99,12 @@ public class Scim2ClientImpl implements Scim2Client {
             if (rtResponse.getCode() != 200) {
                 log.error("Response code for " + PATH_RESOURCETYPES + " is not 200, but " + rtResponse.getCode());
                 throw new ScimException("Response code for " + PATH_RESOURCETYPES + " is not 200, but " + rtResponse.getCode());
+            } else if (rtResponse.getBody() == null || rtResponse.getBody().isEmpty()) {
+                log.error("Response Body for " + PATH_RESOURCETYPES + " is empty");
+                throw new ScimException("Response Body is empty for " + PATH_RESOURCETYPES);
+            } else if (!isValidJSON(rtResponse.getBody())) {
+                log.error("Response Body for " + PATH_RESOURCETYPES + " is NOT a valid JSON");
+                throw new ScimException("Response Body for " + PATH_RESOURCETYPES + " is NOT a valid JSON");
             }
         } catch (ScimException e) {
             if (resourceTypesJson != null && !resourceTypesJson.isEmpty()) {
@@ -108,6 +121,12 @@ public class Scim2ClientImpl implements Scim2Client {
             if (schemasResponse.getCode() != 200) {
                 log.error("Response code for " + PATH_SCHEMAS + " is not 200, but " + schemasResponse.getCode());
                 throw new ScimException("Response code for " + PATH_SCHEMAS + " is not 200, but " + schemasResponse.getCode());
+            } else if (schemasResponse.getBody() == null || schemasResponse.getBody().isEmpty()) {
+                log.error("Response Body for " + PATH_SCHEMAS + " is empty");
+                throw new ScimException("Response Body is empty for " + PATH_SCHEMAS);
+            } else if (!isValidJSON(rtResponse.getBody())) {
+                log.error("Response Body for " + PATH_SCHEMAS + " is NOT a valid JSON");
+                throw new ScimException("Response Body for " + PATH_SCHEMAS + " is NOT a valid JSON");
             }
         } catch (ScimException e) {
             if (schemasJson != null && !schemasJson.isEmpty()) {
@@ -433,5 +452,20 @@ public class Scim2ClientImpl implements Scim2Client {
     @Override
     public Collection<Schema> getSchemas() {
         return protocol.getSchemas().values();
+    }
+
+    public static boolean isValidJSON(final String json) {
+        boolean valid = true;
+        try {
+            objectMapper.enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+            objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+            objectMapper.readTree(json);
+        } catch(JsonProcessingException e) {
+            log.error("Json Processing error ", e);
+            valid = false;
+        } catch (Exception e) {
+            log.error("Json unknown processing error ", e);
+        }
+        return valid;
     }
 }
