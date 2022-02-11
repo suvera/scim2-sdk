@@ -80,9 +80,9 @@ public class Scim2ClientImpl implements Scim2Client {
             } else if (spResponse.getBody() == null || spResponse.getBody().isEmpty()) {
                 log.error("Response Body for " + PATH_SP + " is empty");
                 throw new ScimException("Response Body is empty for " + PATH_SP);
-            } else if (!isValidJSON(spResponse.getBody())) {
-                log.error("Response Body for " + PATH_SP + " is NOT a valid JSON");
-                throw new ScimException("Response Body for " + PATH_SP + " is NOT a valid JSON");
+            } else if (!isValidJSONObject(spResponse.getBody())) {
+                log.error("Response Body for " + PATH_SP + " is NOT a valid JSON object");
+                throw new ScimException("Response Body for " + PATH_SP + " is NOT a valid JSON object");
             }
         } catch (ScimException e) {
             if (spConfigJson != null && !spConfigJson.isEmpty()) {
@@ -102,9 +102,9 @@ public class Scim2ClientImpl implements Scim2Client {
             } else if (rtResponse.getBody() == null || rtResponse.getBody().isEmpty()) {
                 log.error("Response Body for " + PATH_RESOURCETYPES + " is empty");
                 throw new ScimException("Response Body is empty for " + PATH_RESOURCETYPES);
-            } else if (!isValidJSON(rtResponse.getBody())) {
-                log.error("Response Body for " + PATH_RESOURCETYPES + " is NOT a valid JSON");
-                throw new ScimException("Response Body for " + PATH_RESOURCETYPES + " is NOT a valid JSON");
+            } else if (!isValidJSONObject(rtResponse.getBody())) {
+                log.error("Response Body for " + PATH_RESOURCETYPES + " is NOT a valid JSON object");
+                throw new ScimException("Response Body for " + PATH_RESOURCETYPES + " is NOT a valid JSON object");
             }
         } catch (ScimException e) {
             if (resourceTypesJson != null && !resourceTypesJson.isEmpty()) {
@@ -124,9 +124,9 @@ public class Scim2ClientImpl implements Scim2Client {
             } else if (schemasResponse.getBody() == null || schemasResponse.getBody().isEmpty()) {
                 log.error("Response Body for " + PATH_SCHEMAS + " is empty");
                 throw new ScimException("Response Body is empty for " + PATH_SCHEMAS);
-            } else if (!isValidJSON(rtResponse.getBody())) {
-                log.error("Response Body for " + PATH_SCHEMAS + " is NOT a valid JSON");
-                throw new ScimException("Response Body for " + PATH_SCHEMAS + " is NOT a valid JSON");
+            } else if (!isValidJSONObject(rtResponse.getBody())) {
+                log.error("Response Body for " + PATH_SCHEMAS + " is NOT a valid JSON object");
+                throw new ScimException("Response Body for " + PATH_SCHEMAS + " is NOT a valid JSON object");
             }
         } catch (ScimException e) {
             if (schemasJson != null && !schemasJson.isEmpty()) {
@@ -454,12 +454,16 @@ public class Scim2ClientImpl implements Scim2Client {
         return protocol.getSchemas().values();
     }
 
-    public static boolean isValidJSON(final String json) {
+    public static boolean isValidJSONObject(final String json) {
         boolean valid = true;
+        JsonNode jsonNode = null;
+        ObjectNode objectNode = null;
         try {
             objectMapper.enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
             objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-            objectMapper.readTree(json);
+            jsonNode = objectMapper.readTree(json);
+            // cast to ObjectNode to ensure the JSON received is a valid JSON object
+            objectNode = jsonNode.deepCopy();
         } catch(JsonProcessingException e) {
             log.error("Json Processing error ", e);
             valid = false;
