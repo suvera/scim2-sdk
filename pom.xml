@@ -7,10 +7,11 @@
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <description>SCIM2 SDK Library</description>
 
     <properties>
+        <sdk.version>1.0.0</sdk.version>
         <java.version>11</java.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -191,9 +192,9 @@
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub suvera Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/suvera/scim2-sdk</url>
+            <id>suvera-maven-repo</id>
+            <name>suvera Maven Repo</name>
+            <url>http://localhost:8908</url>
         </repository>
     </distributionManagement>
 

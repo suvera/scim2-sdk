@@ -11,12 +11,13 @@
 
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-server-example</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>scim2-sdk-server-example</name>
     <packaging>jar</packaging>
     <description>SCIM 2.0 Compliance Test Utility</description>
 
     <properties>
+        <sdk.version>1.0.0</sdk.version>
         <java.version>11</java.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -30,7 +31,7 @@
         <dependency>
             <groupId>dev.suvera.scim2</groupId>
             <artifactId>scim2-sdk-server</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${sdk.version}</version>
         </dependency>
 
         <dependency>
@@ -68,11 +69,19 @@
 
     <repositories>
         <repository>
-            <id>github</id>
-            <name>GitHub suvera Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/suvera/scim2-sdk</url>
+            <id>suvera-maven-repo</id>
+            <name>suvera Maven Repo</name>
+            <url>https://suvera.github.io/maven</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>suvera-maven-repo</id>
+            <name>suvera Maven Repo</name>
+            <url>http://localhost:8908</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <pluginManagement>
