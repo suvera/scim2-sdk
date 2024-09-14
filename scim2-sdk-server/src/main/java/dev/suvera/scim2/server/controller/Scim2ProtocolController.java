@@ -48,7 +48,7 @@ public class Scim2ProtocolController {
         }
     }
 
-    @GetMapping("/ResourceTypes/{Id}")
+    @GetMapping("/ResourceTypes/{id}")
     public Object getResourceType(@PathVariable String id) {
         try {
             return service.buildResourceType(id);

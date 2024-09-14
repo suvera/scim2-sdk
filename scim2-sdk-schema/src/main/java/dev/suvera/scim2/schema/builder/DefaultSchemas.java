@@ -29,7 +29,7 @@ public class DefaultSchemas {
 
         rt.setMeta(new MetaRecord(
                 NAME_SCHEMA,
-                DEFAULT_SERVER + PATH_SCHEMAS + id,
+                DEFAULT_SERVER + PATH_SCHEMAS + "/" + id,
                 new Date(1603095350000L),
                 new Date(1603095350000L),
                 "W/\"123\""

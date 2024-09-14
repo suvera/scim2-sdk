@@ -109,7 +109,7 @@ public class Scim2GroupController {
         }
     }
 
-    @GetMapping("/.search")
+    @PostMapping("/.search")
     public ResponseEntity<?> searchGroup(
             @RequestParam(required = false, name = "filter") String filter,
             @RequestParam(required = false, name = "sortBy") String sortBy,

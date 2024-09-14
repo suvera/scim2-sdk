@@ -109,7 +109,7 @@ public class Scim2UserController {
         }
     }
 
-    @GetMapping("/.search")
+    @PostMapping("/.search")
     public ResponseEntity<?> searchUser(
             @RequestParam(required = false, name = "filter") String filter,
             @RequestParam(required = false, name = "sortBy") String sortBy,
