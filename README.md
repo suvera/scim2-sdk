@@ -25,14 +25,17 @@ https://tools.ietf.org/html/rfc7643
 
 This repo contains three components/libraries **schema**, **client** and **server** that supports scim2 protocol.
 
-These libraries can be included in any of your java applications.
+These libraries can be included in any of your java applications. 
+Use below maven repository in your project.
 
 ```
-# clone the repo
-
-cd scim2-sdk
-
-mvn clean install
+<repositories>
+    <repository>
+        <id>github</id>
+        <name>GitHub suvera Apache Maven Packages</name>
+        <url>https://maven.pkg.github.com/suvera/scim2-sdk</url>
+    </repository>
+</repositories>
 
 ```
 

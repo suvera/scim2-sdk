@@ -16,6 +16,15 @@
     <packaging>jar</packaging>
     <description>SCIM2 Server Library</description>
 
+    <properties>
+        <java.version>11</java.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+
+        <guava.version>29.0-jre</guava.version>
+        <lombok.version>1.18.34</lombok.version>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -40,11 +49,57 @@
         </dependency>
 
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>dev.suvera.scim2</groupId>
             <artifactId>scim2-sdk-schema</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>GitHub suvera Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/suvera/scim2-sdk</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub suvera Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/suvera/scim2-sdk</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <annotationProcessorPaths>
+                            <annotationProcessorPath>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </annotationProcessorPath>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
