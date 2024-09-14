@@ -11,9 +11,9 @@
     <description>SCIM2 SDK Library</description>
 
     <properties>
-        <java.version>1.8</java.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>11</java.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
         <guava.version>29.0-jre</guava.version>
         <commons.text.version>1.8</commons.text.version>
@@ -22,7 +22,7 @@
         <commons.io.version>2.7</commons.io.version>
 
         <jackson.version>2.11.2</jackson.version>
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.34</lombok.version>
         <okhttp.version>4.9.0</okhttp.version>
         <json-schema-validator.version>2.2.14</json-schema-validator.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
@@ -165,5 +165,28 @@
         <module>scim2-sdk-server</module>
         <module>scim2-sdk-server-example</module>
     </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <annotationProcessorPaths>
+                            <annotationProcessorPath>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </annotationProcessorPath>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
