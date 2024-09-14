@@ -189,4 +189,12 @@
         </pluginManagement>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub suvera Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/suvera/scim2-sdk</url>
+        </repository>
+    </distributionManagement>
+
 </project>
