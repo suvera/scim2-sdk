@@ -4,6 +4,7 @@ server:
 
 spring:
     application:
+        scimBaseUrl: http://localhost:8880/scim2
         name: scim2-sdk-server-example
         version: 1.0.0
     jackson:
@@ -17,3 +18,27 @@ spring:
         profiles:
             active:
                 - prod
+    datasource:
+        url: jdbc:h2:mem:scimdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;MODE=MYSQL;
+        username: sa
+        password:
+        driverClassName: org.h2.Driver
+        platform: h2
+    jpa:
+        database-platform: org.hibernate.dialect.MariaDBDialect
+        defer-datasource-initialization: true
+        show-sql: true
+        generate-ddl: true
+        database: MYSQL
+        hibernate:
+            ddl-auto: create-drop
+    data:
+        jpa:
+            repositories:
+                bootstrap-mode: default
+    sql:
+        init:
+            mode: always
+    h2:
+        console.enabled: true
+        console.path: /h2-console

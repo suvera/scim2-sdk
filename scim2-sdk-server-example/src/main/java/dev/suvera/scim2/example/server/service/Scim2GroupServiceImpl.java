@@ -1,5 +1,9 @@
 package dev.suvera.scim2.example.server.service;
 
+import dev.suvera.scim2.example.server.jpa.entity.ScimGroup;
+import dev.suvera.scim2.example.server.jpa.entity.ScimUser;
+import dev.suvera.scim2.example.server.jpa.repo.ScimGroupRepository;
+import dev.suvera.scim2.schema.ScimConstant;
 import dev.suvera.scim2.schema.data.ErrorRecord;
 import dev.suvera.scim2.schema.data.group.GroupRecord;
 import dev.suvera.scim2.schema.data.misc.ListResponse;
@@ -7,7 +11,17 @@ import dev.suvera.scim2.schema.data.misc.PatchRequest;
 import dev.suvera.scim2.schema.data.misc.SearchRequest;
 import dev.suvera.scim2.schema.ex.ScimException;
 import dev.suvera.scim2.server.service.Scim2GroupService;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * author: suvera
@@ -15,33 +29,143 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class Scim2GroupServiceImpl implements Scim2GroupService {
+
+    @Autowired
+    private EntityManager em;
+
+    @Autowired
+    private ScimGroupRepository scimGroupRepo;
+
+    @Value("${spring.application.scimBaseUrl}")
+    private String scimBaseUrl;
+
+    @Transactional
     @Override
     public GroupRecord createGroup(GroupRecord record) throws ScimException {
-        throw new ScimException(new ErrorRecord(501, "Not Supported"));
+        ScimGroup grp = new ScimGroup();
+        grp.setDisplayName(record.getDisplayName());
+        em.persist(grp);
+        em.flush();
+
+        record.setId(grp.getId().toString());
+        record.getMeta().setCreated(Date.from(grp.getCreatedAt()));
+        record.getMeta().setLastModified(Date.from(grp.getUpdatedAt()));
+        record.getMeta().setLocation(scimBaseUrl + ScimConstant.PATH_GROUPS + "/" + grp.getId());
+        record.getMeta().setVersion(grp.getUpdatedAt().toString());
+        return record;
     }
 
+    @Transactional
     @Override
-    public GroupRecord patchGroup(String userId, PatchRequest<GroupRecord> request) throws ScimException {
-        throw new ScimException(new ErrorRecord(501, "Not Supported"));
+    public GroupRecord patchGroup(String groupId, PatchRequest<GroupRecord> request) throws ScimException {
+
+        // TODO: Implement patchGroup
+
+        return readGroup(groupId);
     }
 
+    @Transactional
     @Override
-    public GroupRecord replaceGroup(String userId, GroupRecord record) throws ScimException {
-        throw new ScimException(new ErrorRecord(501, "Not Supported"));
+    public GroupRecord replaceGroup(String groupId, GroupRecord record) throws ScimException {
+        Optional<ScimGroup> optGrp = scimGroupRepo.findById(Long.parseLong(groupId));
+
+        if (optGrp.isPresent()) {
+            ScimGroup grp = optGrp.get();
+            grp.setDisplayName(record.getDisplayName());
+            em.persist(grp);
+            em.flush();
+
+            record.setId(grp.getId().toString());
+            record.getMeta().setCreated(Date.from(grp.getCreatedAt()));
+            record.getMeta().setLastModified(Date.from(grp.getUpdatedAt()));
+            record.getMeta().setLocation(scimBaseUrl + ScimConstant.PATH_GROUPS + "/" + grp.getId());
+            record.getMeta().setVersion(grp.getUpdatedAt().toString());
+
+            return record;
+        } else {
+            throw new ScimException(new ErrorRecord(404, "Not Found"));
+        }
     }
 
+    @Transactional
     @Override
-    public void deleteGroup(String userId) throws ScimException {
-        throw new ScimException(new ErrorRecord(501, "Not Supported"));
+    public void deleteGroup(String groupId) throws ScimException {
+        Optional<ScimGroup> optGrp = scimGroupRepo.findById(Long.parseLong(groupId));
+
+        if (optGrp.isPresent()) {
+            scimGroupRepo.delete(optGrp.get());
+        } else {
+            throw new ScimException(new ErrorRecord(404, "Not Found"));
+        }
     }
 
     @Override
     public ListResponse<GroupRecord> searchGroup(SearchRequest record) throws ScimException {
-        throw new ScimException(new ErrorRecord(501, "Not Supported"));
+        int start = record.getStartIndex();
+        if (start < 1) {
+            start = 0;
+        } else {
+            start--;
+        }
+        int pagesize = record.getCount();
+        if (pagesize < 1) {
+            pagesize = 10;
+        }
+        Pageable pageable = PageRequest.of(start, pagesize);
+
+        ListResponse<GroupRecord> response = new ListResponse<>();
+        response.setResources(new ArrayList<>());
+
+        Page<ScimGroup> optList = scimGroupRepo.findAll(pageable);
+        int count = 0;
+        for (ScimGroup grp : optList) {
+            count++;
+            response.getResources().add(buildGroupRecord(grp));
+        }
+
+        response.setItemsPerPage(count);
+        response.setStartIndex(start);
+        response.setTotalResults(count);
+        response.setSchemas(Set.of(ScimConstant.URN_LIST_RESPONSE));
+        return response;
     }
 
     @Override
     public GroupRecord readGroup(String id) throws ScimException {
-        throw new ScimException(new ErrorRecord(501, "Not Supported"));
+        return scimGroupRepo.findById(Long.parseLong(id))
+                .map(this::buildGroupRecord)
+                .orElseThrow(() -> new ScimException(new ErrorRecord(404, "Not Found")));
+    }
+
+    @NotNull
+    private GroupRecord buildGroupRecord(ScimGroup grp) {
+        GroupRecord record = new GroupRecord();
+        record.setId(grp.getId().toString());
+        record.setDisplayName(grp.getDisplayName());
+
+        record.getMeta().setCreated(Date.from(grp.getCreatedAt()));
+        record.getMeta().setLastModified(Date.from(grp.getUpdatedAt()));
+        record.getMeta().setLocation(scimBaseUrl + ScimConstant.PATH_GROUPS + "/" + grp.getId());
+        record.getMeta().setVersion(grp.getUpdatedAt().toString());
+
+        if (record.getMembers() != null) {
+            record.setMembers(getGroupMembers(grp));
+        }
+
+        return record;
+    }
+
+    @NotNull
+    private List<GroupRecord.GroupMember> getGroupMembers(ScimGroup grp) {
+        List<GroupRecord.GroupMember> members = new ArrayList<>();
+        for (ScimUser member : grp.getMembers()) {
+            GroupRecord.GroupMember m = new GroupRecord.GroupMember();
+            m.setType(ScimConstant.NAME_USER);
+            m.setDisplay(member.getFormatted());
+            m.setValue(member.getId().toString());
+            m.setRef(scimBaseUrl + ScimConstant.PATH_USERS + "/" + member.getId());
+            members.add(m);
+        }
+        return members;
     }
 }

@@ -109,21 +109,57 @@ public class Scim2UserController {
         }
     }
 
-    @PostMapping("/.search")
-    public ResponseEntity<?> searchUser(
+    @GetMapping
+    public ResponseEntity<?> searchUsers(
             @RequestParam(required = false, name = "filter") String filter,
             @RequestParam(required = false, name = "sortBy") String sortBy,
-            @RequestParam(required = false, name = "sortOrder") String sortOrder
+            @RequestParam(required = false, name = "sortOrder") String sortOrder,
+            @RequestParam(required = false, name = "attributes") String attributes,
+            @RequestParam(required = false, name = "excludedAttributes") String excludedAttributes,
+            @RequestParam(required = false, name = "startIndex") Integer startIndex,
+            @RequestParam(required = false, name = "count") Integer count
     ) {
         try {
             SearchRequest search = new SearchRequest();
             search.setFilter(filter);
             search.setSortBy(sortBy);
+            if (startIndex != null) {
+                search.setStartIndex(startIndex);
+            }
+            if (count != null) {
+                search.setCount(count);
+            }
+            if (attributes != null) {
+                search.setAttributes(ResponseUtil.cleanCsvStrings(attributes));
+            }
+            if (excludedAttributes != null) {
+                search.setExcludedAttributes(ResponseUtil.cleanCsvStrings(excludedAttributes));
+            }
             if (sortOrder != null) {
                 search.setSortOrder(SortOrder.valueOf(sortOrder.toUpperCase()));
             }
 
             return ResponseEntity.ok().body(service.searchUser(search));
+        } catch (ScimException e) {
+            return ResponseUtil.badRequest(e);
+        } catch (Exception e) {
+            return ResponseUtil.badRequest(e);
+        }
+    }
+
+    @PostMapping("/.search")
+    public ResponseEntity<?> searchUser(
+            @RequestBody String data
+    ) {
+        SearchRequest record;
+        try {
+            record = objectMapper.readValue(data, SearchRequest.class);
+        } catch (Exception e) {
+            return ResponseUtil.badRequest(e);
+        }
+
+        try {
+            return ResponseEntity.ok().body(service.searchUser(record));
         } catch (ScimException e) {
             return ResponseUtil.badRequest(e);
         } catch (Exception e) {
