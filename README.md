@@ -132,12 +132,23 @@ This is a Spring Boot library, can be added to your boot application like below.
 ``` 
 
 - You need to implement interfaces defined in **service** package of scim2-sdk-server.  Check the package code for more details.
-
 - Append **"dev.suvera.scim2.server"** package to **scanBasePackages** config option of SpringBootApplication like below.
-         
-```
-@SpringBootApplication(scanBasePackages = {"dev.suvera.scim2.server", "your packages here ..."})
 
+```java
+@SpringBootApplication(scanBasePackages = {"dev.suvera.scim2.server", "your packages here ..."})
+```
+
+SCIM search **filter** parsing capability also provided. You can convert SCIM filter to SQL where clause.
+
+Check the [MysqlFilterConverter.java](scim2-sdk-schema/src/main/java/dev/suvera/scim2/schema/filter/mysql/MysqlFilterConverter.java) for example implementation.
+
+```java
+MysqlFilterConverter c = new MysqlFilterConverter();
+c.convert("userName co \"bjensen\"", Map.of("userName", "user_name"));
+
+DbFilterClause clause = c.getClause();
+System.out.println(clause.getWhereClause().toString());
+System.out.println(clause.getBinds());
 ```
 
 ### Example:
