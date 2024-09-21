@@ -28,7 +28,6 @@ public class MysqlFilterConverter extends BaseDbFilterConverter {
         ScimFilterParser.parse(filter, this);
     }
 
-    @SuppressWarnings("DuplicateExpressions")
     @Override
     public void onAttributeExpression(AttributeExpression expression) {
         String column = this.getMappedColumn(expression);
@@ -204,7 +203,7 @@ public class MysqlFilterConverter extends BaseDbFilterConverter {
 
     @Override
     public void onOpenParenthesis(boolean negated) {
-        clause.getWhereClause().append(negated ? " NOT ( " : "( ");
+        clause.getWhereClause().append(negated ? " NOT ( " : " ( ");
     }
 
     @Override

@@ -1,5 +1,4 @@
 # SCIM 2.0 Java SDK
-[!NOTE]
 > JDK 17+
 
 System for Cross-domain Identity Management (**SCIM**) specification is designed to make managing 
@@ -152,6 +151,7 @@ DbFilterClause clause = c.getClause();
 System.out.println(clause.getWhereClause().toString());
 System.out.println(clause.getBinds());
 ```
+Working example usage of the filter converter is at [ScimUserDao.java](scim2-sdk-server-example/src/main/java/dev/suvera/scim2/example/server/jpa/repo/ScimUserDao.java).
 
 ### Example:
 
