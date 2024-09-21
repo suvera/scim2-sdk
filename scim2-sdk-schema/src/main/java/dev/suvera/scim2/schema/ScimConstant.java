@@ -2,6 +2,7 @@ package dev.suvera.scim2.schema;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.text.SimpleDateFormat;
 import java.util.Set;
 
 /**
@@ -67,5 +68,7 @@ public class ScimConstant {
 
     public static final String DEFAULT_SERVER = "http://localhost:8880/scim2";
 
+    public static final SimpleDateFormat SCIM_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    public static final SimpleDateFormat READ_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 }

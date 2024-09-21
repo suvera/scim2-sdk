@@ -1,4 +1,5 @@
 # SCIM 2.0 Java SDK
+> JDK 17+
 
 System for Cross-domain Identity Management (**SCIM**) specification is designed to make managing 
 user identities in cloud-based applications and services easier. The specification suite seeks to 
@@ -47,7 +48,7 @@ This library contains SCIM 2.0 protocol definitions, json schemas, resources, an
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-schema</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -60,7 +61,7 @@ This library contains SCIM 2.0 compatible Http client.
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-client</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -127,18 +128,30 @@ This is a Spring Boot library, can be added to your boot application like below.
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-server</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ``` 
 
 - You need to implement interfaces defined in **service** package of scim2-sdk-server.  Check the package code for more details.
-
 - Append **"dev.suvera.scim2.server"** package to **scanBasePackages** config option of SpringBootApplication like below.
-         
-```
-@SpringBootApplication(scanBasePackages = {"dev.suvera.scim2.server", "your packages here ..."})
 
+```java
+@SpringBootApplication(scanBasePackages = {"dev.suvera.scim2.server", "your packages here ..."})
 ```
+
+SCIM search **filter** parsing capability also provided. You can convert SCIM filter to SQL where clause.
+
+Check the [MysqlFilterConverter.java](scim2-sdk-schema/src/main/java/dev/suvera/scim2/schema/filter/mysql/MysqlFilterConverter.java) for example implementation.
+
+```java
+MysqlFilterConverter c = new MysqlFilterConverter();
+c.convert("userName co \"bjensen\"", Map.of("userName", "user_name"));
+
+DbFilterClause clause = c.getClause();
+System.out.println(clause.getWhereClause().toString());
+System.out.println(clause.getBinds());
+```
+Working example usage of the filter converter is at [ScimUserDao.java](scim2-sdk-server-example/src/main/java/dev/suvera/scim2/example/server/jpa/repo/ScimUserDao.java).
 
 ### Example:
 

@@ -11,13 +11,13 @@
 
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-server-example</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>scim2-sdk-server-example</name>
     <packaging>jar</packaging>
     <description>SCIM 2.0 Compliance Test Utility</description>
 
     <properties>
-        <sdk.version>1.0.0</sdk.version>
+        <sdk.version>1.0.1</sdk.version>
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>

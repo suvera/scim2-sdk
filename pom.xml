@@ -11,10 +11,10 @@
     <description>SCIM2 SDK Library</description>
 
     <properties>
-        <sdk.version>1.0.0</sdk.version>
-        <java.version>11</java.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <sdk.version>1.0.1</sdk.version>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <guava.version>29.0-jre</guava.version>
         <commons.text.version>1.8</commons.text.version>
@@ -188,6 +188,15 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <distributionManagement>

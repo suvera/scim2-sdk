@@ -33,6 +33,7 @@ public class SearchRequest {
     private String sortBy;
 
     private SortOrder sortOrder;
+
     private Integer startIndex;
     private Integer count;
 
@@ -54,6 +55,13 @@ public class SearchRequest {
         }
         if (count != null) {
             b.append("filter=").append(count).append("&");
+        }
+
+        if (attributes != null) {
+            b.append("attributes=").append(String.join(",", attributes)).append("&");
+        }
+        if (excludedAttributes != null) {
+            b.append("excludedAttributes=").append(String.join(",", excludedAttributes)).append("&");
         }
 
         return b.toString();

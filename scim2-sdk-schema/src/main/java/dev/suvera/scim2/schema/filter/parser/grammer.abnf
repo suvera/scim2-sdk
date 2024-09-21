@@ -1,0 +1,27 @@
+FILTER    = attrExp / logExp / valuePath / *1"not" "(" FILTER ")"
+
+valuePath = attrPath "[" valFilter "]"
+; FILTER uses sub-attributes of a parent attrPath
+
+valFilter = attrExp / logExp / *1"not" "(" valFilter ")"
+
+attrExp   = (attrPath SP "pr") / (attrPath SP compareOp SP compValue)
+
+logExp    = FILTER SP ("and" / "or") SP FILTER
+
+compValue = false / null / true / number / string
+; rules from JSON (RFC 7159)
+
+compareOp = "eq" / "ne" / "co" / "sw" / "ew" / "gt" / "lt" / "ge" / "le"
+
+attrPath  = [URI ":"] ATTRNAME *1subAttr
+; SCIM attribute name
+; URI is SCIM "schema" URI
+
+ATTRNAME  = ALPHA *(nameChar)
+
+nameChar  = "-" / "_" / DIGIT / ALPHA
+
+subAttr   = "." ATTRNAME
+; a sub-attribute of a complex attribute
+
