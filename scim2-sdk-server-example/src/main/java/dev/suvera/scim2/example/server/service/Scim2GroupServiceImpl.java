@@ -2,6 +2,7 @@ package dev.suvera.scim2.example.server.service;
 
 import dev.suvera.scim2.example.server.jpa.entity.ScimGroup;
 import dev.suvera.scim2.example.server.jpa.entity.ScimUser;
+import dev.suvera.scim2.example.server.jpa.repo.ScimGroupDao;
 import dev.suvera.scim2.example.server.jpa.repo.ScimGroupRepository;
 import dev.suvera.scim2.schema.ScimConstant;
 import dev.suvera.scim2.schema.data.ErrorRecord;
@@ -16,9 +17,6 @@ import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -38,6 +36,9 @@ public class Scim2GroupServiceImpl implements Scim2GroupService {
 
     @Value("${spring.application.scimBaseUrl}")
     private String scimBaseUrl;
+
+    @Autowired
+    private ScimGroupDao scimGroupDao;
 
     @Transactional
     @Override
@@ -101,31 +102,17 @@ public class Scim2GroupServiceImpl implements Scim2GroupService {
 
     @Override
     public ListResponse<GroupRecord> searchGroup(SearchRequest record) throws ScimException {
-        int start = record.getStartIndex();
-        if (start < 1) {
-            start = 0;
-        } else {
-            start--;
-        }
-        int pagesize = record.getCount();
-        if (pagesize < 1) {
-            pagesize = 10;
-        }
-        Pageable pageable = PageRequest.of(start, pagesize);
-
         ListResponse<GroupRecord> response = new ListResponse<>();
         response.setResources(new ArrayList<>());
 
-        Page<ScimGroup> optList = scimGroupRepo.findAll(pageable);
-        int count = 0;
-        for (ScimGroup grp : optList) {
-            count++;
-            response.getResources().add(buildGroupRecord(grp));
+        ScimGroupDao.SearchResults optList = scimGroupDao.searchGroups(record);
+        for (ScimGroup usr : optList.getResults()) {
+            response.getResources().add(buildGroupRecord(usr));
         }
 
-        response.setItemsPerPage(count);
-        response.setStartIndex(start);
-        response.setTotalResults(count);
+        response.setItemsPerPage(optList.getItemsPerPage());
+        response.setStartIndex(optList.getStartIndex());
+        response.setTotalResults(optList.getTotalResults());
         response.setSchemas(Set.of(ScimConstant.URN_LIST_RESPONSE));
         return response;
     }

@@ -33,6 +33,7 @@ public class SearchRequest {
     private String sortBy;
 
     private SortOrder sortOrder;
+
     private Integer startIndex;
     private Integer count;
 

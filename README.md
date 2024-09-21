@@ -1,4 +1,6 @@
 # SCIM 2.0 Java SDK
+[!NOTE]
+> JDK 17+
 
 System for Cross-domain Identity Management (**SCIM**) specification is designed to make managing 
 user identities in cloud-based applications and services easier. The specification suite seeks to 
@@ -47,7 +49,7 @@ This library contains SCIM 2.0 protocol definitions, json schemas, resources, an
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-schema</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -60,7 +62,7 @@ This library contains SCIM 2.0 compatible Http client.
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-client</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -127,7 +129,7 @@ This is a Spring Boot library, can be added to your boot application like below.
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-server</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ``` 
 

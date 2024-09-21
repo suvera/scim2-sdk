@@ -7,7 +7,7 @@ import dev.suvera.scim2.schema.data.ErrorRecord;
  * date: 10/17/2020 10:36 AM
  */
 @SuppressWarnings("unused")
-public class ScimException extends Exception {
+public class ScimException extends RuntimeException {
     private ErrorRecord error;
 
     public ScimException(ErrorRecord error) {

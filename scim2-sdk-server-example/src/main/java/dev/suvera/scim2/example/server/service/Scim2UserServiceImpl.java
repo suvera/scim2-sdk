@@ -2,6 +2,7 @@ package dev.suvera.scim2.example.server.service;
 
 import dev.suvera.scim2.example.server.jpa.entity.ScimGroup;
 import dev.suvera.scim2.example.server.jpa.entity.ScimUser;
+import dev.suvera.scim2.example.server.jpa.repo.ScimUserDao;
 import dev.suvera.scim2.example.server.jpa.repo.ScimUserRepository;
 import dev.suvera.scim2.schema.ScimConstant;
 import dev.suvera.scim2.schema.data.ErrorRecord;
@@ -16,9 +17,6 @@ import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -38,6 +36,9 @@ public class Scim2UserServiceImpl implements Scim2UserService {
 
     @Value("${spring.application.scimBaseUrl}")
     private String scimBaseUrl;
+
+    @Autowired
+    private ScimUserDao scimUserDao;
 
     @Transactional
     @Override
@@ -114,31 +115,17 @@ public class Scim2UserServiceImpl implements Scim2UserService {
 
     @Override
     public ListResponse<UserRecord> searchUser(SearchRequest record) throws ScimException {
-        int start = record.getStartIndex();
-        if (start < 1) {
-            start = 0;
-        } else {
-            start--;
-        }
-        int pagesize = record.getCount();
-        if (pagesize < 1) {
-            pagesize = 10;
-        }
-        Pageable pageable = PageRequest.of(start, pagesize);
-
         ListResponse<UserRecord> response = new ListResponse<>();
         response.setResources(new ArrayList<>());
 
-        Page<ScimUser> optList = scimUserRepo.findAll(pageable);
-        int count = 0;
-        for (ScimUser usr : optList) {
-            count++;
+        ScimUserDao.SearchResults optList = scimUserDao.searchUsers(record);
+        for (ScimUser usr : optList.getResults()) {
             response.getResources().add(buildUserRecord(usr));
         }
-
-        response.setItemsPerPage(count);
-        response.setStartIndex(start);
-        response.setTotalResults(count);
+        
+        response.setItemsPerPage(optList.getItemsPerPage());
+        response.setStartIndex(optList.getStartIndex());
+        response.setTotalResults(optList.getTotalResults());
         response.setSchemas(Set.of(ScimConstant.URN_LIST_RESPONSE));
         return response;
     }

@@ -1,5 +1,6 @@
 package dev.suvera.scim2.schema.filter;
 
+import dev.suvera.scim2.schema.ScimConstant;
 import dev.suvera.scim2.schema.data.NullObject;
 import dev.suvera.scim2.schema.enums.FilterCondition;
 import dev.suvera.scim2.schema.enums.FilterOperation;
@@ -10,7 +11,10 @@ import dev.suvera.scim2.schema.filter.parser.SCIMFilterParser;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.text.ParseException;
+import java.time.Instant;
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.Iterator;
 
 class ScimFilterListenerInternal extends SCIMFilterBaseListener {
@@ -154,6 +158,8 @@ class ScimFilterListenerInternal extends SCIMFilterBaseListener {
                 a.setValueType(ValueType.INTEGER);
             } else if (val instanceof Double || val instanceof Float) {
                 a.setValueType(ValueType.DECIMAL);
+            } else if (val instanceof Date) {
+                a.setValueType(ValueType.DATE_TIME);
             }
         }
         listener.onAttributeExpression(a);
@@ -216,7 +222,16 @@ class ScimFilterListenerInternal extends SCIMFilterBaseListener {
         String val = ctx.getText();
         if (val.startsWith("\"") && val.endsWith("\"")) {
             val = val.substring(1, val.length() - 1);
-            values.push(val);
+            if (val.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z")) {
+                try {
+                    Date date = ScimConstant.SCIM_DATE_FORMAT.parse(val);
+                    values.push(date);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            } else {
+                values.push(val);
+            }
         } else if (val.equals("true") || val.equals("false")) {
             values.push(Boolean.parseBoolean(val));
         } else if (val.equals("null")) {

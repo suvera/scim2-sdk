@@ -1,13 +1,15 @@
 package dev.suvera.scim2.schema.filter.mysql;
 
+import dev.suvera.scim2.schema.ScimConstant;
+import dev.suvera.scim2.schema.data.ErrorRecord;
 import dev.suvera.scim2.schema.enums.FilterCondition;
 import dev.suvera.scim2.schema.enums.FilterOperation;
 import dev.suvera.scim2.schema.enums.ValueType;
+import dev.suvera.scim2.schema.ex.ScimException;
 import dev.suvera.scim2.schema.filter.BaseDbFilterConverter;
 import dev.suvera.scim2.schema.filter.ScimFilterParser;
 import dev.suvera.scim2.schema.filter.data.AttributeExpression;
 import dev.suvera.scim2.schema.filter.data.DbFilterClause;
-import lombok.Getter;
 
 import java.util.Map;
 
@@ -29,14 +31,14 @@ public class MysqlFilterConverter extends BaseDbFilterConverter {
     @SuppressWarnings("DuplicateExpressions")
     @Override
     public void onAttributeExpression(AttributeExpression expression) {
-        String column = this.columnMappings.get(expression.getAttribute());
-        if (column == null) {
-            column = this.columnMappings.get(expression.getFqdn());
-        }
+        String column = this.getMappedColumn(expression);
 
         if (column == null) {
-            //column = expression.getAttribute();
-            throw new IllegalArgumentException("No mapped db column found for filter column: " + expression.getAttribute());
+            ErrorRecord error = new ErrorRecord();
+            error.setStatus(400);
+            error.setDetail("Filter column '" + expression.getAttribute() + "' is not supported in this context");
+            error.setScimType("invalidFilter");
+            throw new ScimException(error);
         }
 
         StringBuilder where = clause.getWhereClause();
@@ -71,6 +73,12 @@ public class MysqlFilterConverter extends BaseDbFilterConverter {
                         clause.getBinds().put(bindVar, value);
                         break;
 
+                    case DATE_TIME:
+                        where.append(column);
+                        where.append(compOp).append(bindVar);
+                        clause.getBinds().put(bindVar, ScimConstant.READ_DATE_FORMAT.format(value));
+                        break;
+
                     case NULL:
                         where.append(column);
                         if (op == FilterCondition.NOT_EQUAL) {
@@ -80,7 +88,11 @@ public class MysqlFilterConverter extends BaseDbFilterConverter {
                         }
                         break;
                     default:
-                        throw new IllegalArgumentException("Unsupported value type: " + valueType);
+                        ErrorRecord error = new ErrorRecord();
+                        error.setStatus(400);
+                        error.setDetail("Filter column '" + expression.getAttribute() + "' has Unsupported value type " + valueType);
+                        error.setScimType("invalidFilter");
+                        throw new ScimException(error);
                 }
                 break;
 
@@ -88,7 +100,11 @@ public class MysqlFilterConverter extends BaseDbFilterConverter {
             case STARTS_WITH:
             case ENDS_WITH:
                 if (valueType != ValueType.STRING) {
-                    throw new IllegalArgumentException("Unsupported value type for operator: " + op);
+                    ErrorRecord error = new ErrorRecord();
+                    error.setStatus(400);
+                    error.setDetail("Filter column '" + expression.getAttribute() + "' has Unsupported value type for operator " + op);
+                    error.setScimType("invalidFilter");
+                    throw new ScimException(error);
                 }
 
                 if (this.caseInsensitive) {
@@ -116,8 +132,16 @@ public class MysqlFilterConverter extends BaseDbFilterConverter {
             case GREATER_THAN:
             case LESSER_THAN_EQUALS:
             case GREATER_THAN_EQUALS:
-                if (valueType != ValueType.INTEGER && valueType != ValueType.DECIMAL) {
-                    throw new IllegalArgumentException("Unsupported value type for operator: " + op);
+                if (valueType != ValueType.INTEGER && valueType != ValueType.DECIMAL && valueType != ValueType.DATE_TIME) {
+                    ErrorRecord error = new ErrorRecord();
+                    error.setStatus(400);
+                    error.setDetail("Filter column '" + expression.getAttribute() + "' has Unsupported value type for operator " + valueType + " -> " + op);
+                    error.setScimType("invalidFilter");
+                    throw new ScimException(error);
+                }
+
+                if (valueType == ValueType.DATE_TIME) {
+                    value = ScimConstant.READ_DATE_FORMAT.format(value);
                 }
 
                 where.append(column);
@@ -138,6 +162,7 @@ public class MysqlFilterConverter extends BaseDbFilterConverter {
                         where.append(" >= :");
                         break;
                 }
+                where.append(bindVar);
                 clause.getBinds().put(bindVar, value);
                 break;
 
@@ -169,7 +194,11 @@ public class MysqlFilterConverter extends BaseDbFilterConverter {
                 break;
 
             default:
-                throw new IllegalArgumentException("Unsupported filter operator: " + expression.getOperator());
+                ErrorRecord error = new ErrorRecord();
+                error.setStatus(400);
+                error.setDetail("Filter column '" + expression.getAttribute() + "' has Unsupported filter operator " + expression.getOperator());
+                error.setScimType("invalidFilter");
+                throw new ScimException(error);
         }
     }
 
