@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.suvera.scim2.schema.ScimConstant;
 import dev.suvera.scim2.schema.data.BaseRecord;
 import dev.suvera.scim2.schema.data.ScimResponse;
@@ -21,8 +21,6 @@ import dev.suvera.scim2.schema.util.UrlUtil;
 import lombok.Data;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,7 +34,6 @@ import static dev.suvera.scim2.schema.ScimConstant.*;
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
 @Data
 public class Scim2ClientImpl implements Scim2Client {
-    private final static Logger log = LogManager.getLogger(Scim2ClientImpl.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final boolean DEBUG = false;
 
@@ -52,11 +49,11 @@ public class Scim2ClientImpl implements Scim2Client {
     }
 
     protected Scim2ClientImpl(
-        String endPoint,
-        OkHttpClient client,
-        String spConfigJson,
-        String resourceTypesJson,
-        String schemasJson
+            String endPoint,
+            OkHttpClient client,
+            String spConfigJson,
+            String resourceTypesJson,
+            String schemasJson
     ) throws ScimException {
         this.spConfigJson = spConfigJson;
         this.resourceTypesJson = resourceTypesJson;
@@ -76,18 +73,18 @@ public class Scim2ClientImpl implements Scim2Client {
         try {
             spResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_SP, null));
             if (spResponse.getCode() != 200) {
-                log.error("Response code for " + PATH_SP + " is not 200, but " + spResponse.getCode());
+                System.out.println("Response code for " + PATH_SP + " is not 200, but " + spResponse.getCode());
                 throw new ScimException("Response code for " + PATH_SP + " is not 200, but " + spResponse.getCode());
             } else if (spResponse.getBody() == null || spResponse.getBody().isEmpty()) {
-                log.error("Response Body for " + PATH_SP + " is empty");
+                System.out.println("Response Body for " + PATH_SP + " is empty");
                 throw new ScimException("Response Body is empty for " + PATH_SP);
             } else if (!isValidJSONObject(spResponse.getBody())) {
-                log.error("Response Body for " + PATH_SP + " is NOT a valid JSON object");
+                System.out.println("Response Body for " + PATH_SP + " is NOT a valid JSON object");
                 throw new ScimException("Response Body for " + PATH_SP + " is NOT a valid JSON object");
             }
         } catch (ScimException e) {
             if (spConfigJson != null && !spConfigJson.isEmpty()) {
-                log.info("Could not get response from {}, Using Default Json for ServiceProviderConfig", PATH_SP);
+                System.out.println("Could not get response from {}, Using Default Json for ServiceProviderConfig " + PATH_SP);
                 spResponse = new ScimResponse(200, spConfigJson, headers);
             } else {
                 throw e;
@@ -98,18 +95,18 @@ public class Scim2ClientImpl implements Scim2Client {
         try {
             rtResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_RESOURCETYPES, null));
             if (rtResponse.getCode() != 200) {
-                log.error("Response code for " + PATH_RESOURCETYPES + " is not 200, but " + rtResponse.getCode());
+                System.out.println("Response code for " + PATH_RESOURCETYPES + " is not 200, but " + rtResponse.getCode());
                 throw new ScimException("Response code for " + PATH_RESOURCETYPES + " is not 200, but " + rtResponse.getCode());
             } else if (rtResponse.getBody() == null || rtResponse.getBody().isEmpty()) {
-                log.error("Response Body for " + PATH_RESOURCETYPES + " is empty");
+                System.out.println("Response Body for " + PATH_RESOURCETYPES + " is empty");
                 throw new ScimException("Response Body is empty for " + PATH_RESOURCETYPES);
             } else if (!isValidJSONObject(rtResponse.getBody())) {
-                log.error("Response Body for " + PATH_RESOURCETYPES + " is NOT a valid JSON object");
+                System.out.println("Response Body for " + PATH_RESOURCETYPES + " is NOT a valid JSON object");
                 throw new ScimException("Response Body for " + PATH_RESOURCETYPES + " is NOT a valid JSON object");
             }
         } catch (ScimException e) {
             if (resourceTypesJson != null && !resourceTypesJson.isEmpty()) {
-                log.info("Could not get response from {}, Using Default Json for ResourceTypes", PATH_RESOURCETYPES);
+                System.out.println("Could not get response from {}, Using Default Json for ResourceTypes " + PATH_RESOURCETYPES);
                 rtResponse = new ScimResponse(200, resourceTypesJson, headers);
             } else {
                 throw e;
@@ -120,25 +117,25 @@ public class Scim2ClientImpl implements Scim2Client {
         try {
             schemasResponse = ScimResponse.of(doRequest(HttpMethod.GET, PATH_SCHEMAS, null));
             if (schemasResponse.getCode() != 200) {
-                log.error("Response code for " + PATH_SCHEMAS + " is not 200, but " + schemasResponse.getCode());
+                System.out.println("Response code for " + PATH_SCHEMAS + " is not 200, but " + schemasResponse.getCode());
                 throw new ScimException("Response code for " + PATH_SCHEMAS + " is not 200, but " + schemasResponse.getCode());
             } else if (schemasResponse.getBody() == null || schemasResponse.getBody().isEmpty()) {
-                log.error("Response Body for " + PATH_SCHEMAS + " is empty");
+                System.out.println("Response Body for " + PATH_SCHEMAS + " is empty");
                 throw new ScimException("Response Body is empty for " + PATH_SCHEMAS);
             } else if (!isValidJSONObject(rtResponse.getBody())) {
-                log.error("Response Body for " + PATH_SCHEMAS + " is NOT a valid JSON object");
+                System.out.println("Response Body for " + PATH_SCHEMAS + " is NOT a valid JSON object");
                 throw new ScimException("Response Body for " + PATH_SCHEMAS + " is NOT a valid JSON object");
             }
         } catch (ScimException e) {
             if (schemasJson != null && !schemasJson.isEmpty()) {
-                log.info("Could not get response from {}, Using Default Json for Schemas", PATH_SCHEMAS);
+                System.out.println("Could not get response from {}, Using Default Json for Schemas " + PATH_SCHEMAS);
                 schemasResponse = new ScimResponse(200, schemasJson, headers);
             } else {
                 throw e;
             }
         }
 
-        log.info("Got SCIM Implementation Details");
+        System.out.println("Got SCIM Implementation Details");
         this.protocol = new Scim2Protocol(spResponse, rtResponse, schemasResponse);
     }
 
@@ -151,7 +148,7 @@ public class Scim2ClientImpl implements Scim2Client {
             throw new ScimException("Client Exception, empty Path");
         }
 
-        log.info("Http {} request {}", method, path);
+        System.out.printf("Http %s request %s\n", method, path);
         path = StringUtils.stripStart(path, " /");
         path = "/" + path;
 
@@ -342,7 +339,7 @@ public class Scim2ClientImpl implements Scim2Client {
         try {
             patchResponse.setResource(mapToObject(response.getBody(), request.getRecordType()));
         } catch (ScimException e) {
-            log.error("Patch request has no Resource received. {}", e.getMessage());
+            System.out.printf("Patch request has no Resource received. %s \n", e.getMessage());
         }
 
         return patchResponse;
@@ -463,14 +460,14 @@ public class Scim2ClientImpl implements Scim2Client {
             objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
             jsonNode = objectMapper.readTree(json);
             if (!jsonNode.isObject()) {
-                log.error("Input is not a valid object structure");
+                System.out.println("Input is not a valid object structure");
                 valid = false;
             }
-        } catch(JsonProcessingException e) {
-            log.error("Json Processing error ", e);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
             valid = false;
         } catch (Exception e) {
-            log.error("Json unknown processing error ", e);
+            e.printStackTrace();
         }
         return valid;
     }

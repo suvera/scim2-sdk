@@ -24,12 +24,11 @@
 
         <jackson.version>2.11.2</jackson.version>
         <lombok.version>1.18.34</lombok.version>
-        <okhttp.version>4.9.0</okhttp.version>
+        <okhttp.version>4.12.0</okhttp.version>
         <json-schema-validator.version>2.2.14</json-schema-validator.version>
-        <validation-api.version>2.0.1.Final</validation-api.version>
+        <validation-api.version>3.1.0</validation-api.version>
         <junit.version>5.7.0</junit.version>
-        <bean.validator.version>6.1.6.Final</bean.validator.version>
-        <log4j.version>2.13.3</log4j.version>
+        <bean.validator.version>8.0.1.Final</bean.validator.version>
     </properties>
 
     <dependencyManagement>
@@ -108,8 +107,8 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
             <version>${validation-api.version}</version>
         </dependency>
 
@@ -122,18 +121,6 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator-annotation-processor</artifactId>
             <version>${bean.validator.version}</version>
-        </dependency>
-
-        <!-- Logging -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
         </dependency>
 
         <!-- Tesing -->

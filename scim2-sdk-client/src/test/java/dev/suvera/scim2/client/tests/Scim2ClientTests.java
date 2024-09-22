@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +17,6 @@ public class Scim2ClientTests {
 
     @BeforeAll
     public static void beforeAll() throws Exception {
-        Configurator.setAllLevels(LogManager.getRootLogger().getName(), Level.INFO);
         server = new MockWebServer();
         server.start();
     }
