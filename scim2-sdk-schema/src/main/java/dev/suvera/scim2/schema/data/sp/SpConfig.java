@@ -6,8 +6,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -17,8 +19,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class SpConfig extends BaseRecord {
-    @NotBlank(message = "documentationUri cannot be empty")
-    private String documentationUri;
+    private String documentationUri = null;
     @NotNull(message = "patch cannot be null")
     private Supported patch;
     @NotNull(message = "bulk cannot be null")
@@ -70,10 +71,15 @@ public class SpConfig extends BaseRecord {
         @NotBlank(message = "type cannot be null")
         private String type;
         @NotBlank(message = "name cannot be null")
-        private String name;
-        private String description;
-        private String specUri;
-        private String documentationUri;
-        private Boolean primary;
+        @Nullable
+        private String name = null;
+        @Nullable
+        private String description = null;
+        @Nullable
+        private String specUri = null;
+        @Nullable
+        private String documentationUri = null;
+        @Nullable
+        private Boolean primary = null;
     }
 }

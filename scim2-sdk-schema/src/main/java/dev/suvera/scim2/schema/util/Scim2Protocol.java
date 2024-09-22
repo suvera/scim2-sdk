@@ -23,13 +23,11 @@ import dev.suvera.scim2.schema.enums.ScimOperation;
 import dev.suvera.scim2.schema.ex.ScimException;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -42,7 +40,6 @@ import java.util.Set;
 @SuppressWarnings({"unused"})
 @Data
 public class Scim2Protocol {
-    private final static Logger log = LogManager.getLogger(Scim2Protocol.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final Validator beanValidator;
     private static final boolean DEBUG = false;
@@ -63,9 +60,9 @@ public class Scim2Protocol {
                 .getValidator();
 
         if (DEBUG) {
-            log.info("spResponse {}", spResponse);
-            log.info("resourceTypesResponse {}", resourceTypesResponse);
-            log.info("schemasResponse {}", schemasResponse);
+            System.out.println("spResponse " + spResponse);
+            System.out.println("resourceTypesResponse " + resourceTypesResponse);
+            System.out.println("schemasResponse " + schemasResponse);
         }
 
         buildSpConfig(spResponse);
@@ -149,7 +146,7 @@ public class Scim2Protocol {
 
             if (error != null && !error.isEmpty()) {
                 throw new ScimException("Service response for " + resource + " has invalid data values. "
-                        + error);
+                                        + error);
             }
 
             schemas.put(schema.getId(), schema);
@@ -195,7 +192,7 @@ public class Scim2Protocol {
 
             if (error != null && !error.isEmpty()) {
                 throw new ScimException("Service response for " + resource + " has invalid data values. "
-                        + error);
+                                        + error);
             }
 
             resourceTypes.put(resourceType.getSchema(), resourceType);
@@ -215,7 +212,7 @@ public class Scim2Protocol {
 
             if (!schemas.containsKey(schemaId)) {
                 throw new ScimException("Could not find Schema with id " + schemaId
-                        + ", but mentioned in ResourceType " + resourceType.getName());
+                                        + ", but mentioned in ResourceType " + resourceType.getName());
             }
 
             resourceType.setSchemaObject(schemas.get(schemaId));
@@ -226,8 +223,8 @@ public class Scim2Protocol {
                 for (SchemaExt schemaExt : resourceType.getSchemaExtensions()) {
                     if (!schemas.containsKey(schemaExt.getSchema())) {
                         throw new ScimException("Could not find Schema with id " + schemaId
-                                + ", but mentioned in ResourceType.schemaExtensions "
-                                + resourceType.getName());
+                                                + ", but mentioned in ResourceType.schemaExtensions "
+                                                + resourceType.getName());
                     }
                     schemaExtObjects.add(new SchemaExtension(
                             schemas.get(schemaExt.getSchema()),
@@ -246,7 +243,7 @@ public class Scim2Protocol {
             try {
                 JsonNode sNode = JsonLoader.fromString(builder.build());
                 if (DEBUG) {
-                    log.info(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(sNode));
+                    System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(sNode));
                 }
                 resourceType.setJsonSchema(JsonSchemaFactory.byDefault().getJsonSchema(sNode));
             } catch (Exception e) {
@@ -302,13 +299,13 @@ public class Scim2Protocol {
     ) throws ScimException {
         if (response == null) {
             throw new ScimException("Empty HTTP Response received while Reading a resource "
-                    + resourceType.getName());
+                                    + resourceType.getName());
         }
         if (!(response.getCode() == 204 || response.getCode() == 404)) {
             throw new ScimException("Unexpected http code received "
-                    + response.getCode()
-                    + " while deleting a resource of type " + resourceType.getName()
-                    + " expected value is one of [204, 404]"
+                                    + response.getCode()
+                                    + " while deleting a resource of type " + resourceType.getName()
+                                    + " expected value is one of [204, 404]"
                     , buildErrorBody(response.getBody()));
         }
     }
@@ -320,13 +317,13 @@ public class Scim2Protocol {
 
         if (response == null) {
             throw new ScimException("Empty HTTP Response received while Reading a resource "
-                    + resourceType.getName());
+                                    + resourceType.getName());
         }
         if (!(response.getCode() == 200)) {
             throw new ScimException("Unexpected http code received "
-                    + response.getCode()
-                    + " while deleting a resource of type " + resourceType.getName()
-                    + " expected value is one of [204, 404]"
+                                    + response.getCode()
+                                    + " while deleting a resource of type " + resourceType.getName()
+                                    + " expected value is one of [204, 404]"
                     , buildErrorBody(response.getBody()));
         }
 
@@ -334,7 +331,7 @@ public class Scim2Protocol {
             JsonSchemaUtil.validate(response.getBody(), resourceType.getJsonSchema());
         } catch (Exception e) {
             throw new ScimException("Resource data object read for "
-                    + resourceType.getName() + " is not following Schema.", e);
+                                    + resourceType.getName() + " is not following Schema.", e);
         }
     }
 
@@ -344,13 +341,13 @@ public class Scim2Protocol {
     ) throws ScimException {
         if (response == null) {
             throw new ScimException("Empty HTTP Response received while Reading a resource "
-                    + resourceType.getName());
+                                    + resourceType.getName());
         }
         if (!(response.getCode() == 201)) {
             throw new ScimException("Unexpected http code received "
-                    + response.getCode()
-                    + " while creating a resource of type " + resourceType.getName()
-                    + " expected value is one of [201]"
+                                    + response.getCode()
+                                    + " while creating a resource of type " + resourceType.getName()
+                                    + " expected value is one of [201]"
                     , buildErrorBody(response.getBody()));
         }
 
@@ -358,7 +355,7 @@ public class Scim2Protocol {
             JsonSchemaUtil.validate(response.getBody(), resourceType.getJsonSchema());
         } catch (Exception e) {
             throw new ScimException("Resource data object created for "
-                    + resourceType.getName() + " is not following Schema.", e);
+                                    + resourceType.getName() + " is not following Schema.", e);
         }
     }
 
@@ -368,13 +365,13 @@ public class Scim2Protocol {
     ) throws ScimException {
         if (response == null) {
             throw new ScimException("Empty HTTP Response received while Updating a resource "
-                    + resourceType.getName());
+                                    + resourceType.getName());
         }
         if (!(response.getCode() == 200)) {
             throw new ScimException("Unexpected http code received "
-                    + response.getCode()
-                    + " while updating a resource of type " + resourceType.getName()
-                    + " expected value is one of [200]"
+                                    + response.getCode()
+                                    + " while updating a resource of type " + resourceType.getName()
+                                    + " expected value is one of [200]"
                     , buildErrorBody(response.getBody()));
         }
 
@@ -382,7 +379,7 @@ public class Scim2Protocol {
             JsonSchemaUtil.validate(response.getBody(), resourceType.getJsonSchema());
         } catch (Exception e) {
             throw new ScimException("Resource data object updated for "
-                    + resourceType.getName() + " is not following Schema.", e);
+                                    + resourceType.getName() + " is not following Schema.", e);
         }
     }
 
@@ -390,14 +387,14 @@ public class Scim2Protocol {
             ScimResponse response,
             ResourceType resourceType
     ) throws ScimException {
-        
+
         if (!sp.getPatch().getSupported()) {
             return;
         }
 
         if (response == null) {
             throw new ScimException("Empty HTTP Response received while Patching a resource "
-                    + resourceType.getName());
+                                    + resourceType.getName());
         }
         // Patching resource may return few params in object response, so not checking with full schema.
     }
@@ -472,15 +469,15 @@ public class Scim2Protocol {
         }
         if (contentType == null || !ScimConstant.SCIM_CONTENT_TYPES.contains(contentType)) {
             throw new ScimException("Invalid Response for " + resource + ", header "
-                    + ScimConstant.CONTENT_TYPE + " is not received. expected value is one of ["
-                    + Joiner.on(",").join(ScimConstant.SCIM_CONTENT_TYPES) + "]");
+                                    + ScimConstant.CONTENT_TYPE + " is not received. expected value is one of ["
+                                    + Joiner.on(",").join(ScimConstant.SCIM_CONTENT_TYPES) + "]");
         }
 
         if (successCodes != null) {
             if (!successCodes.contains(response.getCode())) {
                 throw new ScimException("Unexpected http code received "
-                        + response.getCode() + " for " + resource + ", expected value is one of ["
-                        + Joiner.on(",").join(successCodes) + "]", buildErrorBody(response.getBody()));
+                                        + response.getCode() + " for " + resource + ", expected value is one of ["
+                                        + Joiner.on(",").join(successCodes) + "]", buildErrorBody(response.getBody()));
             }
         }
     }
@@ -494,8 +491,8 @@ public class Scim2Protocol {
         if (actual == null) {
             if (strict) {
                 throw new ScimException("Empty schemas attribute found for " + resource
-                        + ", Expected value is one of ["
-                        + Joiner.on(",").join(allowed) + "]");
+                                        + ", Expected value is one of ["
+                                        + Joiner.on(",").join(allowed) + "]");
             }
             return;
         }
@@ -503,8 +500,8 @@ public class Scim2Protocol {
         for (String val : actual) {
             if (!allowed.contains(val)) {
                 throw new ScimException("Unexpected schema value "
-                        + val + " found for " + resource + ", allowed value is one of ["
-                        + Joiner.on(",").join(allowed) + "]");
+                                        + val + " found for " + resource + ", allowed value is one of ["
+                                        + Joiner.on(",").join(allowed) + "]");
             }
         }
     }
