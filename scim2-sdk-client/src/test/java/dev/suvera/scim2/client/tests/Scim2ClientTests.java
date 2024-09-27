@@ -40,6 +40,6 @@ public class Scim2ClientTests {
         HttpUrl url = server.url("/");
         String endPoint = url.toString();
 
-        System.out.println(endPoint);
+        System.out.println("testJobdStatus01: endPoint " + endPoint);
     }
 }

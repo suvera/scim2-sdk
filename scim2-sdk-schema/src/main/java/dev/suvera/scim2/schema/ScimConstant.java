@@ -71,4 +71,8 @@ public class ScimConstant {
     public static final SimpleDateFormat SCIM_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     public static final SimpleDateFormat READ_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    static {
+        SCIM_DATE_FORMAT.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+        READ_DATE_FORMAT.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+    }
 }

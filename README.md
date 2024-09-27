@@ -48,7 +48,7 @@ This library contains SCIM 2.0 protocol definitions, json schemas, resources, an
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-schema</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -61,7 +61,7 @@ This library contains SCIM 2.0 compatible Http client.
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-client</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -128,7 +128,7 @@ This is a Spring Boot library, can be added to your boot application like below.
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-server</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ``` 
 

@@ -1,6 +1,5 @@
 package dev.suvera.scim2.schema.filter;
 
-import dev.suvera.scim2.schema.ScimConstant;
 import dev.suvera.scim2.schema.data.NullObject;
 import dev.suvera.scim2.schema.enums.FilterCondition;
 import dev.suvera.scim2.schema.enums.FilterOperation;
@@ -8,11 +7,10 @@ import dev.suvera.scim2.schema.enums.ValueType;
 import dev.suvera.scim2.schema.filter.data.AttributeExpression;
 import dev.suvera.scim2.schema.filter.parser.SCIMFilterBaseListener;
 import dev.suvera.scim2.schema.filter.parser.SCIMFilterParser;
+import dev.suvera.scim2.schema.util.DateUtil;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.text.ParseException;
-import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.Iterator;
@@ -222,12 +220,13 @@ class ScimFilterListenerInternal extends SCIMFilterBaseListener {
         String val = ctx.getText();
         if (val.startsWith("\"") && val.endsWith("\"")) {
             val = val.substring(1, val.length() - 1);
-            if (val.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z")) {
+            if (val.matches("\\d{4}-\\d{2}-\\d{2}[TZ0-9:.+\\-]+")) {
                 try {
-                    Date date = ScimConstant.SCIM_DATE_FORMAT.parse(val);
+                    Date date = DateUtil.parseDate(val);
                     values.push(date);
-                } catch (ParseException e) {
-                    throw new RuntimeException(e.getMessage());
+                } catch (Exception e) {
+                    if (DEBUG) System.out.println("Error parsing date: " + val);
+                    values.push(val);
                 }
             } else {
                 values.push(val);
