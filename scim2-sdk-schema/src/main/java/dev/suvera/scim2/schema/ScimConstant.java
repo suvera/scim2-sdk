@@ -35,9 +35,10 @@ public class ScimConstant {
             = ImmutableSet.of("application/scim+json", "application/json");
 
     public static final Set<String> SCIM_DEFAULT_SCHEMAS = ImmutableSet.of(
-            URN_SP_CONFIG,
-            URN_RESOURCE_TYPE,
-            URN_SCHEMA,
+            // "Atlassian Guard" does not return "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig" schema.
+//            URN_SP_CONFIG,
+//            URN_RESOURCE_TYPE,
+//            URN_SCHEMA,
             URN_USER,
             URN_GROUP
     );

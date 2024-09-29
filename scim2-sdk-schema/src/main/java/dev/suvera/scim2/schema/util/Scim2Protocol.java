@@ -28,10 +28,8 @@ import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 /**
  * author: suvera
@@ -132,6 +130,10 @@ public class Scim2Protocol {
         }
 
         for (Schema schema : listResponse.getResources()) {
+            // "Atlassian Guard" does not return "schemas" attribute in response.
+            if (schema.getSchemas() == null) {
+                schema.setSchemas(ImmutableSet.of(ScimConstant.URN_SCHEMA));
+            }
             verifySchemasInResponse(
                     resource,
                     schema.getSchemas(),

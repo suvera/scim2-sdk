@@ -13,7 +13,7 @@ cd scim2-sdk-server-example
 
 mvn clean install
 
-java -jar target/scim2-sdk-server-example-1.0.2.jar
+java -jar target/scim2-sdk-server-example-1.0.3.jar
 
 
 # Tomcat started on port(s): 8880 (http) with context path ''
@@ -38,7 +38,7 @@ Check **pom.xml** for dependencies.
 <dependency>
     <groupId>dev.suvera.scim2</groupId>
     <artifactId>scim2-sdk-server</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 
 ```

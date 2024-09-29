@@ -11,7 +11,7 @@
     <description>SCIM2 SDK Library</description>
 
     <properties>
-        <sdk.version>1.0.2</sdk.version>
+        <sdk.version>1.0.3</sdk.version>
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
