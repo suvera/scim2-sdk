@@ -1,6 +1,7 @@
 package dev.suvera.scim2.schema.data.user;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.suvera.scim2.schema.ScimConstant;
 import dev.suvera.scim2.schema.data.BaseRecord;
 import dev.suvera.scim2.schema.data.ExtensionRecord;
@@ -22,6 +23,9 @@ import java.util.Set;
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserRecord extends BaseRecord {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     private String userName;
     private UserName name;
     private String displayName;
@@ -56,25 +60,20 @@ public class UserRecord extends BaseRecord {
 
     @JsonAnySetter
     protected void setExtensions(String key, Object value) {
-        if (value instanceof ExtensionRecord) {
-            this.extensions.put(key, (ExtensionRecord) value);
-            if (this.schemas != null) {
-                this.schemas.add(key);
-            }
-        } else if (value instanceof Map) {
-            ExtensionRecord enterprise = new ExtensionRecord();
-            Map<String, Object> map = (Map<String, Object>) value;
+        ExtensionRecord extension;
 
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                enterprise.set(entry.getKey(), entry.getValue());
-            }
-
-            this.extensions.put(key, enterprise);
-            if (this.schemas != null) {
-                this.schemas.add(key);
-            }
+        if (value instanceof Map) {
+            // Convert raw Map to ExtensionRecord
+            extension = MAPPER.convertValue(value, ExtensionRecord.class);
+        } else if (value instanceof ExtensionRecord) {
+            extension = (ExtensionRecord) value;
         } else {
-            throw new IllegalArgumentException("Invalid field provided " + key);
+            throw new IllegalArgumentException("Invalid field provided: " + key);
+        }
+
+        extensions.put(key, extension);
+        if (this.schemas != null) {
+            this.schemas.add(key);
         }
     }
 

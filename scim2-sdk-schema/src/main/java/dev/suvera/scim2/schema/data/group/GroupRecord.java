@@ -1,6 +1,7 @@
 package dev.suvera.scim2.schema.data.group;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.suvera.scim2.schema.ScimConstant;
 import dev.suvera.scim2.schema.data.BaseRecord;
 import dev.suvera.scim2.schema.data.ExtensionRecord;
@@ -21,6 +22,9 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class GroupRecord extends BaseRecord {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     private String displayName;
     private List<GroupMember> members;
 
@@ -36,13 +40,20 @@ public class GroupRecord extends BaseRecord {
 
     @JsonAnySetter
     protected void setExtensions(String key, Object value) {
-        if (value instanceof ExtensionRecord) {
-            this.extensions.put(key, (ExtensionRecord) value);
-            if (this.schemas != null) {
-                this.schemas.add(key);
-            }
+        ExtensionRecord extension;
+
+        if (value instanceof Map) {
+            // Convert raw Map to ExtensionRecord
+            extension = MAPPER.convertValue(value, ExtensionRecord.class);
+        } else if (value instanceof ExtensionRecord) {
+            extension = (ExtensionRecord) value;
         } else {
-            throw new IllegalArgumentException("Invalid field provided " + key);
+            throw new IllegalArgumentException("Invalid field provided: " + key);
+        }
+
+        extensions.put(key, extension);
+        if (this.schemas != null) {
+            this.schemas.add(key);
         }
     }
 
